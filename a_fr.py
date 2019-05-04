@@ -15,15 +15,14 @@ def get_time(func):
         return a
     return wrapper
 
-img = plt.imread("twh.jpg")
-img2 = plt.imread("twh2.jpg")
 @get_time
-def plot_landmarks(img): #in rgb
+def get_landmarks(img): #in rgb
     face_locations = fr.face_locations(img, model='hog')
     faces_landmarks = fr.face_landmarks(img, face_locations, model='large')
+    return face_locations, faces_landmarks
 
-    print(face_locations)
-    #return img
+@get_time
+def plot(img, face_locations, faces_landmarks):
     for (top, right, bottom, left), face_landmarks in zip(face_locations, faces_landmarks):
         cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
         for landmarks in faces_landmarks:
@@ -32,18 +31,18 @@ def plot_landmarks(img): #in rgb
                     cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
     return img
 
-#plot_landmarks(img)
-#plot_landmarks(img2)
-mask = np.zeros((720, 1080, 3), dtype='bool')
-mask[:, 180:900, :] = True
-print(mask.shape, img.shape)
-img = img[mask].reshape(720, 720, 3)
-plt.imshow(img)
-plt.show()
+@get_time
+def plot_landmarks(img): #in rgb
+    floc, fland = get_landmarks(img)
+    return plot(img, floc, fland)
 
-#plt.imshow(plot_landmarks(img))
-#plt.show()
-
-
-
-#%%
+if __name__ == '__main__':
+    img = plt.imread("a.jpg")
+    img2 = plt.imread("twh.jpg")
+    img3 = plt.imread("twh2.jpg")
+    plt.imshow(plot_landmarks(img))
+    plt.show()
+    plt.imshow(plot_landmarks(img2))
+    plt.show()
+    plt.imshow(plot_landmarks(img3))
+    plt.show()

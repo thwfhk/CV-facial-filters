@@ -1,19 +1,19 @@
 #%%
-import face_recognition as fr 
 import dlib
 from imutils import face_utils
 import cv2
 import numpy as np 
 import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-from time import time
+#import matplotlib.pyplot as plt
+import time
 import functools
 def get_time(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        st = time()
+        st = time.time()
         a = func(*args, **kwargs)
-        print(func.__name__, "time:", time()-st)
+        if __name__ == "__main__":
+            print(func.__name__, "time:", time.time()-st)
         return a
     return wrapper
 
@@ -42,11 +42,19 @@ def plot(img, face_locations, faces_landmarks):
                 cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
     return img
 @get_time
-def plot_landmarks(img, predictor): #in rgb
+def plot_landmarks(img, predictor = predictor68): #in rgb
     floc, fland = get_landmarks(img, predictor)
     return plot(img, floc, fland)
 
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+    glass = cv2.imread("glass")
     img = plt.imread("a.jpg")
-    plt.imshow(plot_landmarks(img, predictor5))
+    img2 = plt.imread("twh.jpg")
+    img3 = plt.imread("twh2.jpg")
+    plt.imshow(plot_landmarks(img))
+    plt.show()
+    plt.imshow(plot_landmarks(img2))
+    plt.show()
+    plt.imshow(plot_landmarks(img3))
     plt.show()
