@@ -83,7 +83,7 @@ def plot_landmarks(img): #in rgb
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    img4 = plt.imread("/Users/candy/code/cv/facial_filter/align/twh3.jpg")
+    img4 = plt.imread("/Users/candy/code/cv/facial_filter/align/me.jpeg")
     plt.imshow(plot_landmarks(img4))
     plt.show()
 
