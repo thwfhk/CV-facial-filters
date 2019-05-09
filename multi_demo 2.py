@@ -95,10 +95,12 @@ def process(worker_id, read_frame_list, write_frame_list):
         # Wait to write
         while Global.write_num != worker_id:
             time.sleep(nap)
+        '''
         if prev_id(worker_id) in write_frame_list:
             (_img, _loc, _land) = write_frame_list[prev_id(worker_id)]
             if _loc != [] and _land != []:
                 face_locations, faces_landmarks = correction(face_locations, faces_landmarks, _loc, _land)
+        '''
         frame_process = a_mtcnn.plot(rgb_frame, face_locations, faces_landmarks)[:,:,::-1]
         # Send frame to global
         write_frame_list[worker_id] = (frame_process, face_locations, faces_landmarks)

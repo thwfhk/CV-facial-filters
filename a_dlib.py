@@ -37,9 +37,8 @@ def get_landmarks(img, predictor): #in rgb
 def plot(img, face_locations, faces_landmarks):
     for (top, right, bottom, left), face_landmarks in zip(face_locations, faces_landmarks):
         cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
-        for landmark in faces_landmarks:
-            for (x, y) in landmark:
-                cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
+        for (x, y) in face_landmarks:
+            cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
     return img
 @get_time
 def plot_landmarks(img, predictor = predictor68): #in rgb
