@@ -1,8 +1,0 @@
-version: '2.3'
-
-services:
-
-  3ddfa:
-    build: .
-    volumes:
-      - ./:/root/
