@@ -1,4 +1,4 @@
-import face_recognition as fr
+# import face_recognition as fr
 import cv2
 import numpy as np
 import dlib
@@ -30,8 +30,10 @@ video_capture = cv2.VideoCapture(0)
 print(video_capture.get(5))
 cv2.namedWindow('meow')
 
-mask = np.zeros((720, 1280, 3), dtype='bool')
-mask[:, 280:1000, :] = True
+w, h = int(video_capture.get(3)), int(video_capture.get(4))
+x = (w-h)//2
+mask = np.zeros((h, w, 3), dtype='bool')
+mask[:, x:w-x, :] = True
 
 fps_list = []
 tmp_time = time.time()

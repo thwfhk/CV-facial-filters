@@ -23,7 +23,7 @@ STD_SIZE = 120
 device = 'cpu'
 
 # 1. load pre-tained model
-checkpoint_fp = '/Users/candy/code/cv/facial_filter/MEOW3DDFA/models/phase1_wpdc_vdc.pth.tar'
+checkpoint_fp = './MEOW3DDFA/models/phase1_wpdc_vdc.pth.tar'
 arch = 'mobilenet_1'
 
 checkpoint = torch.load(checkpoint_fp, map_location=lambda storage, loc: storage)['state_dict']
@@ -40,7 +40,7 @@ if device == 'gpu':
 model.eval()
 
 # 2. load dlib model for face detection and landmark used for face cropping
-dlib_landmark_model = "/Users/candy/code/cv/facial_filter/dlib_data/shape_predictor_68_face_landmarks.dat"
+dlib_landmark_model = "./dlib_data/shape_predictor_68_face_landmarks.dat"
 face_regressor = dlib.shape_predictor(dlib_landmark_model)
 
 def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):

@@ -2,7 +2,7 @@
 import mtcnn
 from MEOW3DDFA import a_3ddfa
 import filters
-import face_recognition as fr
+# import face_recognition as fr
 import dlib
 from imutils import face_utils
 from PIL import Image

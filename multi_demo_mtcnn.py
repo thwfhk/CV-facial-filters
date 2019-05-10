@@ -1,4 +1,4 @@
-import face_recognition as fr
+# import face_recognition as fr
 import cv2
 from multiprocessing import Process, Manager, cpu_count
 import time
@@ -22,9 +22,11 @@ def prev_id(current_id):
         return current_id - 1
 
 
-# resize the img from 720*1280 to 720*720
-mask = np.zeros((720, 1280, 3), dtype='bool')
-mask[:, 280:1000, :] = True
+# resize the img to square
+w, h = int(video_capture.get(3)), int(video_capture.get(4))
+x = (w-h)//2
+mask = np.zeros((h, w, 3), dtype='bool')
+mask[:, x:w-x, :] = True
 
 # A subprocess use to capture frames.
 def capture(read_frame_list):
