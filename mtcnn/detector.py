@@ -5,6 +5,18 @@ from .get_nets import PNet, RNet, ONet
 from .box_utils import nms, calibrate_box, get_image_boxes, convert_to_square
 from .first_stage import run_first_stage
 
+device = 'cpu'
+
+# LOAD MODELS
+if device == 'cpu':
+    pnet = PNet()
+    rnet = RNet()
+    onet = ONet()
+else:
+    pnet = PNet().cuda()
+    rnet = RNet().cuda()
+    onet = ONet().cuda()
+onet.eval()
 
 def detect_faces(image, min_face_size = 20.0,
                  thresholds=[0.6, 0.7, 0.8],
@@ -20,12 +32,6 @@ def detect_faces(image, min_face_size = 20.0,
         two float numpy arrays of shapes [n_boxes, 4] and [n_boxes, 10],
         bounding boxes and facial landmarks.
     """
-
-    # LOAD MODELS
-    pnet = PNet()
-    rnet = RNet()
-    onet = ONet()
-    onet.eval()
 
     # BUILD AN IMAGE PYRAMID
     width, height = image.size
@@ -56,7 +62,7 @@ def detect_faces(image, min_face_size = 20.0,
 
     # run P-Net on different scales
     for s in scales:
-        boxes = run_first_stage(image, pnet, scale = s, threshold = thresholds[0])
+        boxes = run_first_stage(image, pnet, scale = s, threshold = thresholds[0], device=device)
         bounding_boxes.append(boxes)
 
     # collect boxes (and offsets, and scores) from different scales
@@ -79,6 +85,8 @@ def detect_faces(image, min_face_size = 20.0,
     #img_boxes = Variable(torch.FloatTensor(img_boxes), volatile = True)
     with torch.no_grad():
         img_boxes = torch.FloatTensor(img_boxes)
+    if device=='gpu':
+        img_boxes = img_boxes.cuda()
     output = rnet(img_boxes)
     offsets = output[0].data.numpy()  # shape [n_boxes, 4]
     probs = output[1].data.numpy()  # shape [n_boxes, 2]
@@ -102,6 +110,8 @@ def detect_faces(image, min_face_size = 20.0,
     #img_boxes = Variable(torch.FloatTensor(img_boxes), volatile = True)
     with torch.no_grad():
         img_boxes = torch.FloatTensor(img_boxes)
+    if device=='gpu':
+        img_boxes = img_boxes.cuda()
     output = onet(img_boxes)
     landmarks = output[0].data.numpy()  # shape [n_boxes, 10]
     offsets = output[1].data.numpy()  # shape [n_boxes, 4]
