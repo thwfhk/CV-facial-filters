@@ -22,6 +22,7 @@ def prev_id(current_id):
         return current_id - 1
 
 
+video_capture = cv2.VideoCapture(0)
 # resize the img to square
 w, h = int(video_capture.get(3)), int(video_capture.get(4))
 x = (w-h)//2
