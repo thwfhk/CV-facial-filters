@@ -41,7 +41,7 @@ while True:
     process_cnt += 1
     ret, frame = video_capture.read()
     frame = frame[:,::-1,:]
-    frame = frame[mask].reshape(720, 720, 3)
+    frame = frame[mask].reshape(h, h, 3)
     rgb_frame = frame[:,:,::-1].copy()
     if process_cnt % process_prob == 0:
         face_locations, faces_landmarks = a_mtcnn.get_landmarks(rgb_frame)

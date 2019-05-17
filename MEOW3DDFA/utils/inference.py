@@ -126,6 +126,7 @@ def dump_vertex(vertex, wfp):
 
 def _predict_vertices(param, roi_bbox, dense, transform=True):
     vertex = reconstruct_vertex(param, dense=dense)
+    # print(vertex)
     #NOTE: 回到原图的位置
     sx, sy, ex, ey = roi_bbox
     scale_x = (ex - sx) / 120

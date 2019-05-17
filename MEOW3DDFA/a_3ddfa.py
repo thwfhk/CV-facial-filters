@@ -74,8 +74,11 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
         with torch.no_grad():
             if device == 'gpu':
                 input = input.cuda()
-            param = model(input)
-            param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
+                param = model(input)
+                param = param.squeeze().cuda().numpy().flatten().astype(np.float32)
+            else:
+                param = model(input)
+                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
         # 68 pts
         pts68 = predict_68pts(param, roi_box)
@@ -89,8 +92,11 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
             with torch.no_grad():
                 if device == 'gpu':
                     input = input.cuda()
-                param = model(input)
-                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
+                    param = model(input)
+                    param = param.squeeze().cuda().numpy().flatten().astype(np.float32)
+                else:
+                    param = model(input)
+                    param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
             pts68 = predict_68pts(param, roi_box) #2333 predict again
 
