@@ -20,7 +20,7 @@ from .utils.paf import gen_img_paf
 
 STD_SIZE = 120
 
-device = 'cpu'
+device = 'gpu'
 
 # 1. load pre-tained model
 checkpoint_fp = './MEOW3DDFA/models/phase1_wpdc_vdc.pth.tar'
@@ -74,11 +74,8 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
         with torch.no_grad():
             if device == 'gpu':
                 input = input.cuda()
-                param = model(input)
-                param = param.squeeze().cuda().numpy().flatten().astype(np.float32)
-            else:
-                param = model(input)
-                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
+            param = model(input)
+            param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
         # 68 pts
         pts68 = predict_68pts(param, roi_box)

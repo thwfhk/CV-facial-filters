@@ -5,17 +5,17 @@ from .get_nets import PNet, RNet, ONet
 from .box_utils import nms, calibrate_box, get_image_boxes, convert_to_square
 from .first_stage import run_first_stage
 
-device = 'cpu'
+device = 'gpu'
 
 # LOAD MODELS
-if device == 'cpu':
-    pnet = PNet()
-    rnet = RNet()
-    onet = ONet()
-else:
-    pnet = PNet().cuda()
-    rnet = RNet().cuda()
-    onet = ONet().cuda()
+pnet = PNet()
+rnet = RNet()
+onet = ONet()
+if device == 'gpu':
+    pnet = pnet.cuda()
+    rnet = rnet.cuda()
+    onet = onet.cuda()
+
 onet.eval()
 
 def detect_faces(image, min_face_size = 20.0,
@@ -90,8 +90,8 @@ def detect_faces(image, min_face_size = 20.0,
     if device=='gpu':
         img_boxes = img_boxes.cuda()
     output = rnet(img_boxes)
-    offsets = output[0].data.numpy()  # shape [n_boxes, 4]
-    probs = output[1].data.numpy()  # shape [n_boxes, 2]
+    offsets = output[0].data.cpu().numpy()  # shape [n_boxes, 4]
+    probs = output[1].data.cpu().numpy()  # shape [n_boxes, 2]
 
     keep = np.where(probs[:, 1] > thresholds[1])[0]
     bounding_boxes = bounding_boxes[keep]
@@ -115,9 +115,9 @@ def detect_faces(image, min_face_size = 20.0,
     if device=='gpu':
         img_boxes = img_boxes.cuda()
     output = onet(img_boxes)
-    landmarks = output[0].data.numpy()  # shape [n_boxes, 10]
-    offsets = output[1].data.numpy()  # shape [n_boxes, 4]
-    probs = output[2].data.numpy()  # shape [n_boxes, 2]
+    landmarks = output[0].data.cpu().numpy()  # shape [n_boxes, 10]
+    offsets = output[1].data.cpu().numpy()  # shape [n_boxes, 4]
+    probs = output[2].data.cpu().numpy()  # shape [n_boxes, 2]
 
     keep = np.where(probs[:, 1] > thresholds[2])[0]
     bounding_boxes = bounding_boxes[keep]

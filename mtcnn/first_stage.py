@@ -35,6 +35,9 @@ def run_first_stage(image, net, scale, threshold, device='cpu'):
     if device == 'gpu':
         img = img.cuda()
     output = net(img)
+    if device == 'gpu':
+        output[0].data = output[0].data.cpu()
+        output[1].data = output[1].data.cpu()
     probs = output[1].data.numpy()[0, 1, :, :]
     offsets = output[0].data.numpy()
     # probs: probability of a face at each sliding window
