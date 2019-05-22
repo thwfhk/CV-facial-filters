@@ -46,7 +46,7 @@ class Main_Form(QDialog):
         showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
         self.ui.picture.setPixmap(QPixmap.fromImage(showImage))
     
-    def resizeEvent(self, event):
+    def resizeEvent(self, QResizeEvent):
         pass
 
     def showCameraPic(self):
