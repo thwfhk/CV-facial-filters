@@ -1,10 +1,12 @@
 import sys
+import cv2
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-import cv2
+from ui import Ui_Dialog
+
 
 
 selectedFilters = []
@@ -13,8 +15,24 @@ selectedFilters = []
 class Main_Form(QDialog):
     def __init__(self):
         super(Main_Form, self).__init__()
-        self.ui = uic.loadUi('untitled.ui', self)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)
         self.cap = cv2.VideoCapture(0)
+        self.timer = QTimer()
+        self.timer.setInterval(40)
+        self.timer.timeout.connect(self.showCameraPic)
+        self.ui.filtersBox.itemClicked.connect(self.filtersBoxClick)
+        self.ui.captureButton.clicked.connect(self.capButtonClick)
+        self.ui.videoButton.clicked.connect(self.videoButtonClicked)
+        self.video = False
+
+    def videoButtonClicked(self):
+        if self.video:
+            self.timer.stop()
+        else:
+            self.timer.start()
+
+        self.video = not self.video
 
     def filtersBoxClick(self, item):
         print("You chose" + item.text())
@@ -29,25 +47,29 @@ class Main_Form(QDialog):
         self.ui.picture.setPixmap(QPixmap.fromImage(showImage))
     
     def resizeEvent(self, event):
-        self.ui.filtersBox.setGeometry(60, self.height() - self.ui.filtersBox.height() - 16, self.ui.filtersBox.width(), self.ui.filtersBox.height())
-    
-    def capButtonClick(self):
+        pass
+
+    def showCameraPic(self):
         _, img = self.cap.read()
         self.updatePicture(img)
+
+    def capButtonClick(self):
+        self.showCameraPic()
+
+    """def update(self, *__args):
+        _, img = self.cap.read()
+        self.updatePicture(img)"""
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = Main_Form()
-    form.setWindowTitle('baka')
     form.ui.filtersBox.addItem("Hello")
     form.ui.filtersBox.addItem("World")
     tmp = QListWidgetItem()
     tmp.setIcon(QIcon('test.jpg'))
     tmp.setText('')
     form.ui.filtersBox.addItem(tmp)
-    form.ui.filtersBox.itemClicked.connect(form.filtersBoxClick)
-    form.ui.captureButton.clicked.connect(form.capButtonClick)
 
     img = cv2.imread('test.jpg')
     form.updatePicture(img)
