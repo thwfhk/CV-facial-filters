@@ -24,6 +24,7 @@ class Main_Form(QDialog):
         self.ui.filtersBox.itemClicked.connect(self.filtersBoxClick)
         self.ui.captureButton.clicked.connect(self.capButtonClick)
         self.ui.videoButton.clicked.connect(self.videoButtonClicked)
+        self.ui.picture.installEventFilter(self)
         self.video = False
 
     def videoButtonClicked(self):
@@ -40,15 +41,28 @@ class Main_Form(QDialog):
         for i in self.ui.filtersBox.selectedItems():
             self.ui.listWidget.addItem(i.clone())
 
+    def eventFilter(self, source, e):
+        print("detected", e.type())
+        if e.type() == QEvent.DragEnter and source is self.ui.picture:
+            if e.mimeData().hasUrls():
+                if len(e.mimeData().urls()) == 1:
+                    e.ignore()
+            e.accept()
+
+        if e.type() == QEvent.Drop and source is self.ui.picture:
+            print(e.mimeData().urls()[0].toLocalFile())
+            opencv_img = cv2.imread(e.mimeData().urls()[0].toLocalFile())
+            opencv_img = cv2.resize(opencv_img, (640, 480), interpolation=cv2.INTER_CUBIC)
+            self.updatePicture(opencv_img)
+
+        return QWidget.eventFilter(self, source, e)
+
 
     def updatePicture(self, opencv_img):
         img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
         showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
         self.ui.picture.setPixmap(QPixmap.fromImage(showImage))
     
-    def resizeEvent(self, QResizeEvent):
-        pass
-
     def showCameraPic(self):
         _, img = self.cap.read()
         self.updatePicture(img)
@@ -56,9 +70,6 @@ class Main_Form(QDialog):
     def capButtonClick(self):
         self.showCameraPic()
 
-    """def update(self, *__args):
-        _, img = self.cap.read()
-        self.updatePicture(img)"""
 
 
 if __name__ == '__main__':
