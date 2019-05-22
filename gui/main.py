@@ -42,20 +42,22 @@ class Main_Form(QDialog):
             self.ui.listWidget.addItem(i.clone())
 
     def eventFilter(self, source, e):
-        print("detected", e.type())
-        if e.type() == QEvent.DragEnter and source is self.ui.picture:
-            if e.mimeData().hasUrls():
-                if len(e.mimeData().urls()) == 1:
-                    e.ignore()
-            e.accept()
+        if source is self.ui.picture:
+            if e.type() == QEvent.DragEnter:
+                if e.mimeData().hasUrls():
+                    if len(e.mimeData().urls()) == 1:
+                        e.ignore()
+                e.accept()
+                return True
 
-        if e.type() == QEvent.Drop and source is self.ui.picture:
-            print(e.mimeData().urls()[0].toLocalFile())
-            opencv_img = cv2.imread(e.mimeData().urls()[0].toLocalFile())
-            opencv_img = cv2.resize(opencv_img, (640, 480), interpolation=cv2.INTER_CUBIC)
-            self.updatePicture(opencv_img)
+            if e.type() == QEvent.Drop:
+                print(e.mimeData().urls()[0].toLocalFile())
+                opencv_img = cv2.imread(e.mimeData().urls()[0].toLocalFile())
+                opencv_img = cv2.resize(opencv_img, (640, 480), interpolation=cv2.INTER_CUBIC)
+                self.updatePicture(opencv_img)
+                return True
 
-        return QWidget.eventFilter(self, source, e)
+        return QDialog.eventFilter(self, source, e)
 
 
     def updatePicture(self, opencv_img):
