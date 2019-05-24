@@ -66,6 +66,8 @@ def correction(loc1, land1, loc2, land2):
         land.append(i)
     return loc, land
 
+landmarkor = a_3ddfa.my3ddfa('cpu')
+
 @get_time
 def get_landmarks(img, predictor = predictor5): #in rgb
     floc, fslands = mtcnn.detect_faces(Image.fromarray(img), min_face_size=100)
@@ -83,7 +85,7 @@ def get_landmarks(img, predictor = predictor5): #in rgb
         '''
 
     # NOTE: using 3ddfa
-    faces_landmarks, Ps, poses, pts_3ds, roi_boxes = a_3ddfa.meow_landmarks(img, faceRects)
+    faces_landmarks, Ps, poses, pts_3ds, roi_boxes = landmarkor.meow_landmarks(img, faceRects)
 
     '''
     if pts_3ds != []:

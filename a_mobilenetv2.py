@@ -29,6 +29,7 @@ predictor5 = dlib.shape_predictor("dlib_data/shape_predictor_5_face_landmarks.da
 
 detector = mbn.get_detector()
 
+landmarkor = a_3ddfa.my3ddfa('cpu')
 
 @get_time
 def get_landmarks(img, predictor = predictor5): #in rgb
@@ -47,7 +48,7 @@ def get_landmarks(img, predictor = predictor5): #in rgb
         '''
 
     # NOTE: using 3ddfa
-    faces_landmarks, Ps, poses, pts_3ds, roi_boxes = a_3ddfa.meow_landmarks(img, faceRects)
+    faces_landmarks, Ps, poses, pts_3ds, roi_boxes = landmarkor.meow_landmarks(img, faceRects)
 
     '''
     if pts_3ds != []:
