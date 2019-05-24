@@ -84,6 +84,7 @@ def process(worker_id, read_frame_list, write_frame_list):
 
 
 if __name__ == '__main__':
+    print("begin")
 
     # Global variables
     Global = Manager().Namespace()
