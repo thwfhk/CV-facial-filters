@@ -17,9 +17,10 @@ filter_list["nose"] = ["cat_nose"]
 
 def getAllFilters():
     li =  []
-    for type, name_list in filter_list:
+    # print(filter_list)
+    for type, name_list in filter_list.items():
         for filter_name in name_list:
-            img = cv2.imread("./filters_image/" + type + "/" +filter_name+"_show.png", cv2.IMREAD_UNCHANGED)
+            img = cv2.imread("./facial_filters/filters_image/" + type + "/" +filter_name+"_show.png", cv2.IMREAD_UNCHANGED)
             img[:, :, [0, 2]] = img[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
             li.append(Filter(filter_name, img, type))
     return li
