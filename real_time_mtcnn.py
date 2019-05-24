@@ -16,6 +16,12 @@ def get_time(func):
 
 
 import a_mtcnn
+#import a_faced
+#import a_fr
+process_prob = 1
+process_cnt = 0
+face_locations = []
+faces_landmarks = []
 
 
 # 使用rgb，进行了镜面处理
