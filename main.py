@@ -1,6 +1,6 @@
 import sys
 import cv2
-from PyQt5 import uic
+import qdarkstyle
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -60,11 +60,9 @@ class Worker(QThread):
                 self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
                 self.sinOut.emit()
         elif self.typ == "photo":
-            # if self.qinding:
-            #     plt.imshow(self.raw_image)
-            #     plt.show()
             if not self.qinding:
                 self.raw_image = cv2.imread(self.file_name)
+                self.raw_image = self.raw_image[:,::-1,:]
                 self.raw_image = cv2.resize(self.raw_image, (640, 480), interpolation=cv2.INTER_CUBIC)
                 self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
             self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
@@ -189,5 +187,6 @@ if __name__ == '__main__':
     form.ui.eyeFilters.addItem(FilterClass(text="eye", name="eye", img=img, typ="eye"))
     form.ui.earFilters.addItem(FilterClass(text="ear", name="ear", img=img, typ="ear"))
     """
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     form.show()
 sys.exit(app.exec_())
