@@ -18,16 +18,19 @@ selectedFilters = {"nose": None, "eye": None, "ear": None}
 
 
 def npy2qpm(opencv_img):
-    img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
+    img = opencv_img.copy()
+    #img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
+    #img = opencv_img.copy()[:,:,::-1]
     showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
     return QPixmap.fromImage(showImage)
 
 class FilterClass(QListWidgetItem):
     def __init__(self, name, typ, text="", img=None):
         super(FilterClass, self).__init__(text)
+        # print(name, typ, text, img)
         if img is not None:
-            #icon =
-            #icon.addPixmap()
+            plt.imshow(img)
+            plt.show()
             self.setIcon(QIcon(npy2qpm(img)))
         self.setText(text)
         self.name = name
@@ -52,10 +55,12 @@ class Worker(QThread):
         if self.typ == "camera":
             while True:
                 _, frame = self.cap.read()
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 self.data = twh.addFilters(frame, selectedFilters)
                 self.sinOut.emit()
         elif self.typ == "photo":
             _, frame = self.cap.read()
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             self.data = twh.addFilters(frame, selectedFilters)
             self.sinOut.emit()
 
@@ -139,40 +144,32 @@ class Main_Form(QDialog):
         self.ui.picture.setPixmap(npy2qpm(opencv_img))
 
 
-
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = Main_Form()
-
     allFilters = filters.getAllFilters()
-
+    img = cv2.imread('test.jpg')
     for i in allFilters:
         if i.type == "nose":
-            form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            #form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
         elif i.type == "eye":
-            form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            #form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
         elif i.type == "ear":
-            form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            #form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
 
 
     """
-    img = cv2.imread('test.jpg')
     print(img)
 
     form.ui.noseFilters.addItem(FilterClass(text="nose", name="nose", img=img, typ="nose"))
     form.ui.noseFilters.addItem(FilterClass(text="nose1", name="nose1", img=img, typ="nose1"))
     form.ui.eyeFilters.addItem(FilterClass(text="eye", name="eye", img=img, typ="eye"))
     form.ui.earFilters.addItem(FilterClass(text="ear", name="ear", img=img, typ="ear"))
-
-    tmp = QListWidgetItem()
-    tmp.setIcon(QIcon('test.jpg'))
-    tmp.setText('')
-    form.ui.earFilters.addItem(tmp)
     """
-
-    img = cv2.imread('test.jpg')
-    form.updatePicture(img)
-
     form.show()
 sys.exit(app.exec_())

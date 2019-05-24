@@ -3,6 +3,7 @@ import cv2
 import numpy as np 
 import math
 #import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 
 class Filter:
     def __init__(self, fname=None, fimg=None, ftype=None):
@@ -15,22 +16,34 @@ filter_list["eye"] = ["glass"]
 filter_list["ear"] = ["rabbit_ear"]
 filter_list["nose"] = ["cat_nose"]
 
+def padding2square(img):
+    h, w = img.shape[:2]
+    if h < w:
+        delta = w-h
+        # print(img.shape, np.full((delta, w, 3), 255).shape)
+        img = np.concatenate((img, np.full((delta, w, 3), 255)), axis=0)
+    elif h > w:
+        delta = h-w
+        img = np.concatenate((img, np.full((h, delta, 3), 255)), axis=1)
+    return img
+
 def getAllFilters():
     li =  []
     # print(filter_list)
     for type, name_list in filter_list.items():
         for filter_name in name_list:
-            img = cv2.imread("./facial_filters/filters_image/" + type + "/" +filter_name+"_show.png", cv2.IMREAD_UNCHANGED)
-            img[:, :, [0, 2]] = img[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
-            li.append(Filter(filter_name, img, type))
+            img = cv2.imread("./filters_image/" + type + "/" +filter_name+"_show.png")
+            img = padding2square(img)
+            img = cv2.resize(img.astype("float32"), (90, 90))
+            li.append(Filter(filter_name, img.copy(), type))
     return li
 
 def add_filters(img, P, pts_3d, roi_box, selected_filters):
-    if "ear" in selected_filters:
+    if "ear" in selected_filters and selected_filters["ear"] != None:
         img = wear_ears(img.copy(), P, pts_3d, roi_box, selected_filters["ear"])
-    if "eye" in selected_filters:
+    if "eye" in selected_filters and selected_filters["eye"] != None:
         img = wear_glass(img, P, pts_3d, roi_box, selected_filters["eye"])
-    if "nose" in selected_filters:
+    if "nose" in selected_filters and selected_filters["nose"] != None:
         img = wear_nose(img, P, pts_3d, roi_box, selected_filters["nose"])
     return img
 

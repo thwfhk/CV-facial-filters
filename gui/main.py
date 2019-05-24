@@ -146,14 +146,18 @@ if __name__ == '__main__':
     form = Main_Form()
 
     allFilters = filters.getAllFilters()
+    img = cv2.imread('test.jpg')
 
     for i in allFilters:
         if i.type == "nose":
-            form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            # form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
         elif i.type == "eye":
-            form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            # form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.eyeFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
         elif i.type == "ear":
-            form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            # form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
+            form.ui.earFilters.addItem(FilterClass(text="", name=i.name, img=img, typ=i.type))
 
 
     """
