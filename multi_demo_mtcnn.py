@@ -28,6 +28,8 @@ x = (w-h)//2
 mask = np.zeros((h, w, 3), dtype='bool')
 mask[:, x:w-x, :] = True
 
+selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
+
 # A subprocess use to capture frames.
 def capture(read_frame_list):
     video_capture = cv2.VideoCapture(0)
@@ -51,27 +53,6 @@ def capture(read_frame_list):
     video_capture.release()
 
 
-def calc(x, y, th1=20, th2=50):
-    if abs(x-y) < th1:
-        return y
-    elif abs(x-y) < th2:
-        return int((x+y)/2)
-    else:
-        return x
-def correction(loc1, land1, loc2, land2):
-    loc  = []
-    land = []
-    for (t1, r1, b1, l1), (t2, r2, b2, l2) in zip(loc1, loc2):
-        t, r, b, l = calc(t1, t2), calc(r1, r2), calc(b1, b2), calc(l1, l2)
-        loc.append((t, r, b, l))
-    for i1, i2 in zip(land1, land2):
-        i = []
-        for (x1, y1), (x2, y2) in zip(i1, i2):
-            x, y = calc(x1, x2, 10, 20), calc(y1, y2, 10, 20)
-            i.append((x, y))
-        land.append(i)
-    return loc, land
-
 # Many subprocess use to process frames.
 def process(worker_id, read_frame_list, write_frame_list):
     while not Global.is_exit:
@@ -88,19 +69,12 @@ def process(worker_id, read_frame_list, write_frame_list):
 
         rgb_frame = frame_process[:, :, ::-1].copy()
         awsl = a_mtcnn.get_landmarks(rgb_frame)
+        frame_process = a_mtcnn.plot(rgb_frame, *awsl, selected_filters)[:,:,::-1]
 
         # Wait to write
         while Global.write_num != worker_id:
             time.sleep(nap)
         
-        '''
-        if prev_id(worker_id) in write_frame_list:
-            (_img, _loc, _land) = write_frame_list[prev_id(worker_id)]
-            if _loc != [] and _land != []:
-                face_locations, faces_landmarks = correction(face_locations, faces_landmarks, _loc, _land)
-        '''
-        frame_process = a_mtcnn.plot(rgb_frame, *awsl)[:,:,::-1]
-
         # Send frame to global
         #write_frame_list[worker_id] = (frame_process, face_locations, faces_landmarks)
         #write_frame_list[worker_id] = (frame_process, awsl)

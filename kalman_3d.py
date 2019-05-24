@@ -16,7 +16,7 @@ class MyKalman:
                                                              ]
                                                             ),
                                observation_matrices=np.array([[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0]]),
-                               transition_covariance=0.0 * np.eye(6))
+                               transition_covariance=0.01 * np.eye(6))
         # transition_matrices：公式中的A
         # observation_matrices：公式中的H
         # transition_covariance：公式中的Q

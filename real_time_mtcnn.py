@@ -18,13 +18,20 @@ def get_time(func):
 import a_mtcnn
 
 
+# 使用rgb，进行了镜面处理
+def addFilters(frame, selected_filters):
+    frame = frame[:,::-1,:]
+    awsl = a_mtcnn.get_landmarks(frame)
+    return a_mtcnn.plot(frame, *awsl, selected_filters)
+
+selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
 
 if __name__ == '__main__':
     process_prob = 1
     process_cnt = 0
 
-    video_capture = cv2.VideoCapture(0)
-    #video_capture = cv2.VideoCapture('1.mp4')
+    #video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture('1.mp4')
     print(video_capture.get(5))
     cv2.namedWindow('meow')
 
@@ -44,7 +51,7 @@ if __name__ == '__main__':
         rgb_frame = frame[:,:,::-1].copy()
         if process_cnt % process_prob == 0:
             awsl = a_mtcnn.get_landmarks(rgb_frame)
-        frame = a_mtcnn.plot(rgb_frame, *awsl)[:,:,::-1]
+        frame = a_mtcnn.plot(rgb_frame, *awsl, selected_filters)[:,:,::-1]
         cv2.imshow('meow', frame)
 
         delay = time.time() - tmp_time

@@ -25,6 +25,7 @@ def get_time(func):
 predictor68 = dlib.shape_predictor("dlib_data/shape_predictor_68_face_landmarks.dat")
 predictor5 = dlib.shape_predictor("dlib_data/shape_predictor_5_face_landmarks.dat")
 
+
 import kalman_3d
 kalman_list = []
 for i in range(68):
@@ -39,9 +40,31 @@ def use_kalman(pts_3d):
         cur = kalman_list[i]
         x, y, z = cur.update(x, y, z)
         new_pts[0][i], new_pts[1][i], new_pts[2][i] = x, y, z
-    print(np.array(pts_3d) - np.array(new_pts))
+    #print(np.array(pts_3d) - np.array(new_pts))
     return new_pts.copy()
 
+def calc(x, y, th1=20, th2=50):
+    if abs(x-y) < th1:
+        return y
+    elif abs(x-y) < th2:
+        return int((x+y)/2)
+    else:
+        return x
+
+# 没有那么简单，多个face的对应问题
+def correction(loc1, land1, loc2, land2):
+    loc  = []
+    land = []
+    for (t1, r1, b1, l1), (t2, r2, b2, l2) in zip(loc1, loc2):
+        t, r, b, l = calc(t1, t2), calc(r1, r2), calc(b1, b2), calc(l1, l2)
+        loc.append((t, r, b, l))
+    for i1, i2 in zip(land1, land2):
+        i = []
+        for (x1, y1), (x2, y2) in zip(i1, i2):
+            x, y = calc(x1, x2, 10, 20), calc(y1, y2, 10, 20)
+            i.append((x, y))
+        land.append(i)
+    return loc, land
 
 @get_time
 def get_landmarks(img, predictor = predictor5): #in rgb
@@ -61,9 +84,10 @@ def get_landmarks(img, predictor = predictor5): #in rgb
 
     # NOTE: using 3ddfa
     faces_landmarks, Ps, poses, pts_3ds, roi_boxes = a_3ddfa.meow_landmarks(img, faceRects)
+
     '''
     if pts_3ds != []:
-        print("use")
+        #old = pts_3ds[0].copy()
         pts_3ds[0] = use_kalman(pts_3ds[0].copy())
     '''
     
@@ -96,11 +120,6 @@ def plot_landmarks(img, selected_filters): #in rgb
     face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes = get_landmarks(img)
     return plot(img, face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes, selected_filters)
 
-# 使用rgb，进行了镜面处理
-def addFilters(frame, selected_filters):
-    frame = frame[:,::-1,:]
-    awsl = get_landmarks(frame)
-    return plot(frame, *awsl, selected_filters)
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

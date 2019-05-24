@@ -5,9 +5,10 @@ from pykalman import KalmanFilter
 
 class MyKalman:
     def __init__(self):
-        self.kf = KalmanFilter(transition_matrices=np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]]),
+        t = 1
+        self.kf = KalmanFilter(transition_matrices=np.array([[1, 0, t, 0], [0, 1, 0, t], [0, 0, 1, 0], [0, 0, 0, 1]]),
                                observation_matrices=np.array([[1, 0, 0, 0], [0, 1, 0, 0]]),
-                               transition_covariance=0.05 * np.eye(4))
+                               transition_covariance=0.01 * np.eye(4))
         # transition_matrices：公式中的A
         # observation_matrices：公式中的H
         # transition_covariance：公式中的Q
