@@ -5,7 +5,6 @@ import dlib
 import time
 import functools
 
-
 def get_time(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -15,61 +14,64 @@ def get_time(func):
         return a
     return wrapper
 
-from deepface import get_detector
 
-process_prob = 2
+import a_mobilenetv2
+#import a_faced
+#import a_fr
+process_prob = 1
 process_cnt = 0
 face_locations = []
 faces_landmarks = []
 
-video_capture = cv2.VideoCapture(0)
-print(video_capture.get(5))
-cv2.namedWindow('meow')
 
-w, h = int(video_capture.get(3)), int(video_capture.get(4))
-x = (w-h)//2
-mask = np.zeros((h, w, 3), dtype='bool')
-mask[:, x:w-x, :] = True
-
-fps_list = []
-tmp_time = time.time()
-detector = get_detector()
-while True:
-    process_cnt += 1
-    ret, frame = video_capture.read()
+# 使用rgb，进行了镜面处理
+def addFilters(frame, selected_filters):
     frame = frame[:,::-1,:]
-    frame = frame[mask].reshape(h, h, 3)
+    awsl = a_mobilenetv2.get_landmarks(frame)
+    return a_mobilenetv2.plot(frame, *awsl, selected_filters)
 
-    rects = detector.detect(npimg=frame, resize=None)
+selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
 
-    for rect in rects:
-        x1,y1,x2,y2,s = rect
-        if s < 0.5: continue
-        cv2.rectangle(frame, (int(x1),int(y1)), (int(x2),int(y2)), (255,0,0), 2)
+if __name__ == '__main__':
+    process_prob = 1
+    process_cnt = 0
 
-    #rgb_frame = frame[:,:,::-1].copy()
-    #if process_cnt % process_prob == 0:
-    #    face_locations, faces_landmarks = a_mtcnn.get_landmarks(rgb_frame)
+    #video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture('1.mp4')
+    print(video_capture.get(5))
+    cv2.namedWindow('meow')
+
+    w, h = int(video_capture.get(3)), int(video_capture.get(4))
+    x = (w-h)//2
+    mask = np.zeros((h, w, 3), dtype='bool')
+    mask[:, x:w-x, :] = True
 
 
-
-    #frame = a_mtcnn.plot(rgb_frame, face_locations, faces_landmarks)[:,:,::-1]
-
-
-    cv2.imshow('meow', frame)
-
-    delay = time.time() - tmp_time
+    fps_list = []
     tmp_time = time.time()
-    fps_list.append(delay)
-    if len(fps_list) > 5:
-        fps_list.pop(0)
-    fps = len(fps_list) / np.sum(fps_list)
-    print("fps: %.2f" % fps)
+    while True:
+        process_cnt += 1
+        ret, frame = video_capture.read()
+        frame = frame[:,::-1,:]
+        frame = frame[mask].reshape(h, h, 3)
+        rgb_frame = frame[:,:,::-1].copy()
+        if process_cnt % process_prob == 0:
+            awsl = a_mobilenetv2.get_landmarks(rgb_frame)
+        frame = a_mobilenetv2.plot(rgb_frame, *awsl, selected_filters)[:,:,::-1]
+        cv2.imshow('meow', frame)
 
-    time3 = time.time()
-    time.sleep(0.01)
-    if cv2.waitKey(20) & 0xFF == ord('q'):
-        break
+        delay = time.time() - tmp_time
+        tmp_time = time.time()
+        fps_list.append(delay)
+        if len(fps_list) > 5:
+            fps_list.pop(0)
+        fps = len(fps_list) / np.sum(fps_list)
+        print("fps: %.2f" % fps)
 
-video_capture.release()
-cv2.destroyAllWindows()
+        time3 = time.time()
+        time.sleep(0.01)
+        if cv2.waitKey(20) & 0xFF == ord('q'):
+            break
+
+    video_capture.release()
+    cv2.destroyAllWindows()

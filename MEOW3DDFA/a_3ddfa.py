@@ -20,7 +20,7 @@ from .utils.paf import gen_img_paf
 
 STD_SIZE = 120
 
-device = 'gpu'
+device = 'cpu'
 
 # 1. load pre-tained model
 checkpoint_fp = './MEOW3DDFA/models/phase1_wpdc_vdc.pth.tar'

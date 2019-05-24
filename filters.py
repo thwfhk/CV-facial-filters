@@ -6,9 +6,10 @@ import math
 import matplotlib.pyplot as plt
 
 class Filter:
-    def __init__(self, fname=None, fimg=None, ftype=None):
+    def __init__(self, fname=None, fimg=None, fimg_path=None, ftype=None):
         self.name = fname
         self.image = fimg
+        self.image_path = fimg_path
         self.type = ftype
 
 filter_list = {}
@@ -32,10 +33,11 @@ def getAllFilters():
     # print(filter_list)
     for type, name_list in filter_list.items():
         for filter_name in name_list:
+            img_path = "./filters_image/" + type + "/" +filter_name+"_show.png"
             img = cv2.imread("./filters_image/" + type + "/" +filter_name+"_show.png")
             img = padding2square(img)
             img = cv2.resize(img.astype("float32"), (90, 90))
-            li.append(Filter(filter_name, img.copy(), type))
+            li.append(Filter(filter_name, img.copy(), img_path, type))
     return li
 
 def add_filters(img, P, pts_3d, roi_box, selected_filters):
