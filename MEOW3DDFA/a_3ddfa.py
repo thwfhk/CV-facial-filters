@@ -40,7 +40,7 @@ class my3ddfa:
         self.model.load_state_dict(model_dict)
         if device == 'gpu':
             cudnn.benchmark = True
-            self.model = model.cuda()
+            self.model = self.model.cuda()
         self.model.eval()
 
         # 2. load dlib model for face detection and landmark used for face cropping

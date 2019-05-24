@@ -4,6 +4,7 @@ import qdarkstyle
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import numpy as np
 
 import a_mobilenetv2 as twh
 import filters
@@ -32,6 +33,18 @@ class FilterClass(QListWidgetItem):
         self.setText(text)
         self.name = name
         self.typ = typ
+
+def fit_to_480x640(img):
+    if img.shape[0] < 480:
+        delta1 = int((480 - img.shape[0]) / 2)
+        delta2 = 480 - img.shape[0] - delta1
+        img = np.concatenate((np.zeros((delta1, img.shape[1], 3)).astype("uint8"), img, np.zeros((delta2, img.shape[1], 3)).astype("uint8")), axis=0)
+    if img.shape[1] < 640:
+        delta1 = int((640 - img.shape[1]) / 2)
+        delta2 = 640 - img.shape[1] - delta1
+        img = np.concatenate((np.zeros((img.shape[0], delta1, 3)).astype("uint8"), img, np.zeros((img.shape[0], delta2, 3)).astype("uint8")), axis=1)
+    return img
+
 
 
 class Worker(QThread):
@@ -62,9 +75,21 @@ class Worker(QThread):
         elif self.typ == "photo":
             if not self.qinding:
                 self.raw_image = cv2.imread(self.file_name)
-                self.raw_image = self.raw_image[:,::-1,:]
-                self.raw_image = cv2.resize(self.raw_image, (640, 480), interpolation=cv2.INTER_CUBIC)
                 self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
+                self.raw_image = self.raw_image[:,::-1,:]
+
+                h, w = self.raw_image.shape[:2]
+                if h/w >= 480/640:
+                    new_h = 480
+                    new_w = int(new_h * (w/h))
+                else:
+                    new_w = 640
+                    new_h = int(new_w * (h/w))
+                print((new_h, new_w))
+
+                self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+                self.raw_image = fit_to_480x640(self.raw_image)
+
             self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
             self.sinOut.emit()
 
@@ -81,6 +106,11 @@ class Main_Form(QDialog):
         self.ui.picture.installEventFilter(self)
         self.video = False
         self.photo = False
+
+        self.play_green = QIcon('play-green.png')
+        self.play_gray = QIcon('play-gray.png')
+
+        self.ui.cameraButton.setIcon(self.play_gray)
 
         self.photoThread = Worker("photo")
         self.photoThread.sinOut.connect(self.photoCallback)
@@ -101,11 +131,13 @@ class Main_Form(QDialog):
 
     def cameraButtonClicked(self):
         if self.video:
+            self.ui.cameraButton.setIcon(self.play_gray)
             self.cameraThread.keep_running = False
             self.photo = True
             self.photoThread.raw_image = self.cameraThread.raw_image
             self.photoThread.qinding = True
         else:
+            self.ui.cameraButton.setIcon(self.play_green)
             self.photo = False
             self.cameraThread.keep_running = True
             self.cameraThread.start()
@@ -148,6 +180,8 @@ class Main_Form(QDialog):
 
             if e.type() == QEvent.Drop:
                 self.photoThread.qinding = False
+                self.video = False
+                self.ui.cameraButton.setIcon(self.play_gray)
                 self.photoThread.file_name = e.mimeData().urls()[0].toLocalFile()
                 print(self.photoThread.file_name)
                 self.photo = True
@@ -166,7 +200,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = Main_Form()
     allFilters = filters.getAllFilters()
-    img = cv2.imread('edit.jpg')
     for i in allFilters:
         if i.type == "nose":
             #form.ui.noseFilters.addItem(FilterClass(text="", name=i.name, img=i.image, typ=i.type))
