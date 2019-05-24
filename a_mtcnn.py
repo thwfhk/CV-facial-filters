@@ -120,6 +120,12 @@ def plot_landmarks(img, selected_filters): #in rgb
     face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes = get_landmarks(img)
     return plot(img, face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes, selected_filters)
 
+# 使用rgb，进行了镜面处理
+def addFilters(frame, selected_filters):
+    frame = frame[:,::-1,:]
+    awsl = get_landmarks(frame)
+    return plot(frame, *awsl, selected_filters)
+
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
