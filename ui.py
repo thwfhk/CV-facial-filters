@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'untitled.ui'
+# Form implementation generated from reading ui file 'final.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.1
 #
@@ -26,9 +26,6 @@ class Ui_Dialog(object):
         self.eyeFilters.setGridSize(QtCore.QSize(90, 90))
         self.eyeFilters.setViewMode(QtWidgets.QListView.IconMode)
         self.eyeFilters.setObjectName("eyeFilters")
-        self.photoButton = QtWidgets.QPushButton(Dialog)
-        self.photoButton.setGeometry(QtCore.QRect(680, 450, 93, 28))
-        self.photoButton.setObjectName("photoButton")
         self.picture = QtWidgets.QLabel(Dialog)
         self.picture.setGeometry(QtCore.QRect(20, 20, 640, 480))
         self.picture.setAcceptDrops(True)
@@ -37,7 +34,7 @@ class Ui_Dialog(object):
         self.picture.setAlignment(QtCore.Qt.AlignCenter)
         self.picture.setObjectName("picture")
         self.cameraButton = QtWidgets.QPushButton(Dialog)
-        self.cameraButton.setGeometry(QtCore.QRect(790, 450, 93, 28))
+        self.cameraButton.setGeometry(QtCore.QRect(670, 430, 461, 61))
         self.cameraButton.setObjectName("cameraButton")
         self.noseFilters = QtWidgets.QListWidget(Dialog)
         self.noseFilters.setGeometry(QtCore.QRect(670, 310, 461, 100))
@@ -69,7 +66,6 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Pyxie"))
-        self.photoButton.setText(_translate("Dialog", "capture!"))
         self.cameraButton.setText(_translate("Dialog", "OpenCamera"))
         self.label.setText(_translate("Dialog", "Ear Filters:"))
         self.label_2.setText(_translate("Dialog", "Eye Filters:"))
