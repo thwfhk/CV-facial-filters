@@ -41,7 +41,6 @@ class Ui_Dialog(object):
         self.cameraButton.setFont(font)
         self.cameraButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("play-arrow.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.cameraButton.setIcon(icon)
         self.cameraButton.setIconSize(QtCore.QSize(30, 30))
         self.cameraButton.setObjectName("cameraButton")
