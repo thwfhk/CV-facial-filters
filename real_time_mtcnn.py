@@ -21,7 +21,7 @@ def get_time(func):
 import a_mtcnn
 #import a_faced
 #import a_fr
-process_prob = 2
+process_prob = 1
 process_cnt = 0
 face_locations = []
 faces_landmarks = []
