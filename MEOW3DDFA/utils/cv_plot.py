@@ -42,7 +42,7 @@ def build_camera_box(rear_size=90):
     point_3d.append((-rear_size, -rear_size, rear_depth))
 
     front_size = int(4 / 3 * rear_size)
-    front_depth = int(4 / 3 * rear_size)
+    front_depth = 100 #2333r
     point_3d.append((-front_size, -front_size, front_depth))
     point_3d.append((-front_size, front_size, front_depth))
     point_3d.append((front_size, front_size, front_depth))
@@ -66,20 +66,24 @@ def plot_pose_box(image, Ps, pts68s, color=(40, 255, 0), line_width=2):
     if not isinstance(Ps, list):
         Ps = [Ps]
     for i in range(len(pts68s)):
+        # current points68 and camera matrix
         pts68 = pts68s[i]
         llength = calc_hypotenuse(pts68)
         point_3d = build_camera_box(llength)
         P = Ps[i]
 
         # Map to 2d image points
-        point_3d_homo = np.hstack((point_3d, np.ones([point_3d.shape[0], 1])))  # n x 4
+        #print(point_3d)
+        point_3d_homo = np.concatenate((point_3d, np.ones([point_3d.shape[0], 1])), axis=1)  # n x 4
         point_2d = point_3d_homo.dot(P.T)[:, :2]
+        #print(point_2d)
 
-        point_2d[:, 1] = - point_2d[:, 1]
+        point_2d[:, 1] = - point_2d[:, 1] # y=-y for opencv
         point_2d[:, :2] = point_2d[:, :2] - np.mean(point_2d[:4, :2], 0) + np.mean(pts68[:2, :27], 1)
         point_2d = np.int32(point_2d.reshape(-1, 2))
+        #print(point_2d)
 
-        # Draw all the lines
+        # Draw all the lines ;right!
         cv2.polylines(image, [point_2d], True, color, line_width, cv2.LINE_AA)
         cv2.line(image, tuple(point_2d[1]), tuple(point_2d[6]), color, line_width, cv2.LINE_AA)
         cv2.line(image, tuple(point_2d[2]), tuple(point_2d[7]), color, line_width, cv2.LINE_AA)

@@ -25,7 +25,8 @@ process_cnt = 0
 face_locations = []
 faces_landmarks = []
 
-video_capture = cv2.VideoCapture(0)
+#video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture("1.mp4")
 print(video_capture.get(5))
 cv2.namedWindow('meow')
 
@@ -50,7 +51,7 @@ while True:
     tmp_time = time.time()
     fps_list.append(delay)
     if len(fps_list) > 5:
-        fps_list.pop(0
+        fps_list.pop(0)
     fps = len(fps_list) / np.sum(fps_list)
     print("fps: %.2f" % fps)
 

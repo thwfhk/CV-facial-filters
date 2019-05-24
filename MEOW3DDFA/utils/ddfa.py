@@ -25,11 +25,13 @@ def _parse_param(param):
 
 
 def reconstruct_vertex(param, whitening=True, dense=False, transform=True):
+    # NOTE: 得到ROI图像坐标系中的坐标
     """Whitening param -> 3d vertex, based on the 3dmm param: u_base, w_shp, w_exp
     dense: if True, return dense vertex, else return 68 sparse landmarks. All dense or sparse vertex is transformed to
     image coordinate space, but without alignment caused by face cropping.
     transform: whether transform to image space
     """
+    #print("see", len(param), whitening) 62 True
     if len(param) == 12:
         param = np.concatenate((param, [0] * 50))
     if whitening:
@@ -40,22 +42,30 @@ def reconstruct_vertex(param, whitening=True, dense=False, transform=True):
             param = param * param_std + param_mean
 
     p, offset, alpha_shp, alpha_exp = _parse_param(param)
+    # NOTE: p|offset 相似变换
+    # alpha_... shape和expression
+    '''
+    maybe_oripts = (u_base + w_shp_base @ alpha_shp + w_exp_base @ alpha_exp).reshape(3, -1, order='F')
+    # NOTE: 用3DMM表达的人脸，算出的就应该是三维空间中人脸各个点的坐标
+    '''
 
+    pts_3d = (u_base + w_shp_base @ alpha_shp + w_exp_base @ alpha_exp).reshape(3, -1, order='F')
     if dense:
-        vertex = p @ (u + w_shp @ alpha_shp + w_exp @ alpha_exp).reshape(3, -1, order='F') + offset
+ 
+        vertex = p @ pts_3d + offset
 
         if transform:
             # transform to image coordinate space
             vertex[1, :] = std_size + 1 - vertex[1, :]
     else:
         """For 68 pts"""
-        vertex = p @ (u_base + w_shp_base @ alpha_shp + w_exp_base @ alpha_exp).reshape(3, -1, order='F') + offset
+        vertex = p @ pts_3d + offset
 
         if transform:
-            # transform to image coordinate space
+            # transform to image coordinate space ;y=-y!
             vertex[1, :] = std_size + 1 - vertex[1, :]
 
-    return vertex
+    return vertex, pts_3d
 
 
 def img_loader(path):

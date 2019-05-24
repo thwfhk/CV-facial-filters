@@ -62,6 +62,7 @@ class Main_Form(QDialog):
 
     def updatePicture(self, opencv_img):
         img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
+        #img = opencv_img[:,:,::-1]
         showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
         self.ui.picture.setPixmap(QPixmap.fromImage(showImage))
     

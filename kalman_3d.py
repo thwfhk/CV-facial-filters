@@ -4,6 +4,7 @@ from pykalman import KalmanFilter
 
 
 class MyKalman:
+    # dt 应该用两帧间差值
     def __init__(self, dt=1.0):
         self.dt = dt
         self.kf = KalmanFilter(transition_matrices=np.array([[1, 0, 0, self.dt, 0, 0],
@@ -15,7 +16,7 @@ class MyKalman:
                                                              ]
                                                             ),
                                observation_matrices=np.array([[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0]]),
-                               transition_covariance=0.05 * np.eye(6))
+                               transition_covariance=0.0 * np.eye(6))
         # transition_matrices：公式中的A
         # observation_matrices：公式中的H
         # transition_covariance：公式中的Q

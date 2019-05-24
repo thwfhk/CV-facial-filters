@@ -56,7 +56,7 @@ def calc_hypotenuse(pts):
     radius = max(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
     bbox = [center[0] - radius, center[1] - radius, center[0] + radius, center[1] + radius]
     llength = sqrt((bbox[2] - bbox[0]) ** 2 + (bbox[3] - bbox[1]) ** 2)
-    return llength / 3
+    return llength / 3 
 
 
 def parse_roi_box_from_landmark(pts):
@@ -125,7 +125,7 @@ def dump_vertex(vertex, wfp):
 
 
 def _predict_vertices(param, roi_bbox, dense, transform=True):
-    vertex = reconstruct_vertex(param, dense=dense)
+    vertex, pts_3d = reconstruct_vertex(param, dense=dense)
     # print(vertex)
     #NOTE: 回到原图的位置
     sx, sy, ex, ey = roi_bbox
@@ -137,7 +137,7 @@ def _predict_vertices(param, roi_bbox, dense, transform=True):
     s = (scale_x + scale_y) / 2
     vertex[2, :] *= s
 
-    return vertex
+    return vertex, pts_3d
 
 
 def predict_68pts(param, roi_box):

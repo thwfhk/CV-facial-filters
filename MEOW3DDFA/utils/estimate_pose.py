@@ -12,14 +12,11 @@ from .params import param_mean, param_std
 
 def parse_pose(param):
     param = param * param_std + param_mean
-    Ps = param[:12].reshape(3, -1)  # camera matrix
-    # R = P[:, :3]
+    Ps = param[:12].reshape(3, -1)  # NOTE: camera matrix
     s, R, t3d = P2sRt(Ps)
-    P = np.concatenate((R, t3d.reshape(3, -1)), axis=1)  # without scale
-    # P = Ps / s
-    pose = matrix2angle(R)  # yaw, pitch, roll
-    # offset = p_[:, -1].reshape(3, 1)
-    return P, pose
+    P = np.concatenate((R, t3d.reshape(3, -1)), axis=1)  # without scale；
+    pose = matrix2angle(R)  # NOTE: yaw, pitch, roll
+    return P, pose, s
 
 
 def matrix2angle(R):
@@ -50,22 +47,29 @@ def matrix2angle(R):
     return x, y, z
 
 
-def P2sRt(P):
+def P2sRt(P): 
+    #NOTE: 主点和像平面原点对应！
     ''' decompositing camera matrix P.
     Args:
         P: (3, 4). Affine Camera Matrix.
     Returns:
         s: scale factor.
         R: (3, 3). rotation matrix.
-        t2d: (2,). 2d translation.
+        t3d: (3,). 3d translation.
     '''
     t3d = P[:, 3]
     R1 = P[0:1, :3]
     R2 = P[1:2, :3]
-    s = (np.linalg.norm(R1) + np.linalg.norm(R2)) / 2.0
+    s = (np.linalg.norm(R1) + np.linalg.norm(R2)) / 2.0 # L2 norm, f=(f1+f2)/2
     r1 = R1 / np.linalg.norm(R1)
     r2 = R2 / np.linalg.norm(R2)
-    r3 = np.cross(r1, r2)
+    r3 = np.cross(r1, r2) 
+    '''
+    R3 = P[2:3, :3]
+    print(r3, R3/s)
+    '''
+    # bacause (r1 r2 r3)^T is a rotate matrix or r3 = R3/s
+    # NOTE: 去掉scale很科学，scale是人脸三维到图像平面用的
 
     R = np.concatenate((r1, r2, r3), 0)
     return s, R, t3d

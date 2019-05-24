@@ -20,7 +20,7 @@ from .utils.paf import gen_img_paf
 
 STD_SIZE = 120
 
-device = 'gpu'
+device = 'cpu'
 
 # 1. load pre-tained model
 checkpoint_fp = './MEOW3DDFA/models/phase1_wpdc_vdc.pth.tar'
@@ -44,7 +44,7 @@ dlib_landmark_model = "./dlib_data/shape_predictor_68_face_landmarks.dat"
 face_regressor = dlib.shape_predictor(dlib_landmark_model)
 
 def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
-    img_ori = img_ori[:,:,::-1]
+    img_ori = img_ori[:,:,::-1] #rgb->bgr
 
     # 3. forward
     #tri = sio.loadmat('visualize/tri.mat')['tri']
@@ -53,13 +53,15 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
     pts_res = []
     Ps = []  # Camera matrix collection
     poses = []  # pose collection, [todo: validate it]
+    pts_3ds = [] # 三维正脸的68点
+    roi_boxes = []
     for rect in rects:
         # whether use dlib landmark to crop image, if not, use only face bbox to calc roi bbox for cropping
         if use_landmarks:
             # - use landmark for cropping 
             pts = face_regressor(img_ori, rect).parts()
             pts = np.array([[pt.x, pt.y] for pt in pts]).T
-            roi_box = parse_roi_box_from_landmark(pts)
+            roi_box = parse_roi_box_from_landmark(pts) #TODO: to read it 
         else:
             # - use detected face bbox
             # use rects as bbox ang generate roi_bbox
@@ -74,11 +76,12 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
         with torch.no_grad():
             if device == 'gpu':
                 input = input.cuda()
-            param = model(input)
+            param = model(input)  # NOTE: 输入图像是resize后的ROI
             param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
         # 68 pts
-        pts68 = predict_68pts(param, roi_box)
+        pts68, pts_3d = predict_68pts(param, roi_box)
+        # NOTE: pts68:原始图像坐标系上, pts_3d:三维正脸上
 
         # two-step for more accurate bbox to crop face
         if bbox_steps == 'two':
@@ -98,21 +101,35 @@ def meow_landmarks(img_ori, rects, use_landmarks=True, bbox_steps='one'):
             pts68 = predict_68pts(param, roi_box) #2333 predict again
 
         pts_res.append(pts68)
-        P, pose = parse_pose(param) # TODO: what is P and pose
+        P, pose, scale_f = parse_pose(param) # NOTE: get cm and angle
         Ps.append(P)
         poses.append(pose)
 
-    # draw_landmarks(img_ori, pts_res, style="simple", show_flg=true)
-    # img_pose = plot_pose_box(img_ori, Ps, pts_res)
-    return pts_res, Ps, poses
+        pts_3d *= scale_f
+        pts_3ds.append(pts_3d)
 
-def plot(img, face_locations, faces_landmarks):
-    for (top, right, bottom, left), points in zip(face_locations, faces_landmarks):
-        cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
-        for i in range(points.shape[1]):
-            x, y, z = points[0, i], points[1, i], points[2, i]
-            cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
-    return img
+        roi_boxes.append(roi_box)
+
+        ''' show 3d
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        X = pts_3d[0]
+        Y = pts_3d[1]
+        Z = pts_3d[2]
+        ax.scatter(X, Y, Z)
+        plt.show()
+        '''
+
+    '''
+    img_pose = plot_pose_box(img_ori, Ps, pts_res)
+    #img_pose = qwq(img_ori, Ps, pts_res)
+    import matplotlib.pyplot as plt
+    plt.imshow(img_pose[:,:,::-1])
+    plt.show()
+    '''
+    return pts_res, Ps, poses, pts_3ds, roi_boxes
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

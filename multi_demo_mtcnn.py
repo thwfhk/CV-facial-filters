@@ -22,9 +22,8 @@ def prev_id(current_id):
         return current_id - 1
 
 
-video_capture = cv2.VideoCapture(0)
 # resize the img to square
-w, h = int(video_capture.get(3)), int(video_capture.get(4))
+w, h = 1280, 720
 x = (w-h)//2
 mask = np.zeros((h, w, 3), dtype='bool')
 mask[:, x:w-x, :] = True
@@ -32,6 +31,7 @@ mask[:, x:w-x, :] = True
 # A subprocess use to capture frames.
 def capture(read_frame_list):
     video_capture = cv2.VideoCapture(0)
+    #video_capture = cv2.VideoCapture('1.mp4')
     # video_capture.set(5, 30) # Frame rate.
     print("Width: %d, Height: %d, FPS: %d" % (720, 720, video_capture.get(5)))
 
@@ -41,7 +41,7 @@ def capture(read_frame_list):
             # Grab a single frame of video
             ret, frame = video_capture.read()
             frame = frame[:,::-1,:] #mirror
-            frame = frame[mask].reshape(720, 720, 3) #resize
+            frame = frame[mask].reshape(h, h, 3) #resize
             read_frame_list[Global.buff_num] = frame
             Global.buff_num = next_id(Global.buff_num)
         else:
@@ -72,12 +72,6 @@ def correction(loc1, land1, loc2, land2):
         land.append(i)
     return loc, land
 
-    for (top, right, bottom, left), face_landmarks in zip(face_locations, faces_landmarks):
-        cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
-        for landmark in faces_landmarks:
-            for (x, y) in landmark:
-                cv2.circle(img, (x, y), 2, (255, 255, 255), 2)
-
 # Many subprocess use to process frames.
 def process(worker_id, read_frame_list, write_frame_list):
     while not Global.is_exit:
@@ -93,20 +87,24 @@ def process(worker_id, read_frame_list, write_frame_list):
         Global.read_num = next_id(Global.read_num)
 
         rgb_frame = frame_process[:, :, ::-1].copy()
-        face_locations, faces_landmarks = a_mtcnn.get_landmarks(rgb_frame)
+        awsl = a_mtcnn.get_landmarks(rgb_frame)
 
         # Wait to write
         while Global.write_num != worker_id:
             time.sleep(nap)
+        
         '''
         if prev_id(worker_id) in write_frame_list:
             (_img, _loc, _land) = write_frame_list[prev_id(worker_id)]
             if _loc != [] and _land != []:
                 face_locations, faces_landmarks = correction(face_locations, faces_landmarks, _loc, _land)
         '''
-        frame_process = a_mtcnn.plot(rgb_frame, face_locations, faces_landmarks)[:,:,::-1]
+        frame_process = a_mtcnn.plot(rgb_frame, *awsl)[:,:,::-1]
+
         # Send frame to global
-        write_frame_list[worker_id] = (frame_process, face_locations, faces_landmarks)
+        #write_frame_list[worker_id] = (frame_process, face_locations, faces_landmarks)
+        #write_frame_list[worker_id] = (frame_process, awsl)
+        write_frame_list[worker_id] = (frame_process, )
         # Expect next worker to write frame
         Global.write_num = next_id(Global.write_num)
 
