@@ -96,11 +96,8 @@ class my3ddfa:
                 with torch.no_grad():
                     if self.device == 'gpu':
                         input = input.cuda()
-                        param = self.model(input)
-                        param = param.squeeze().cuda().numpy().flatten().astype(np.float32)
-                    else:
-                        param = self.model(input)
-                        param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
+                    param = self.model(input)
+                    param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
                 pts68 = predict_68pts(param, roi_box) #2333 predict again
 

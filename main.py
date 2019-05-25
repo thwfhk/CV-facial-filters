@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 # from PyQt5.QtGui import *
 # import numpy as np
 
-import a_mobilenetv2 as twh
+import maghsk
 import filters
 
 # import time
@@ -17,7 +17,8 @@ from GUIutils import *
 
 from ui import Ui_Dialog
 
-CAMERA_ID = 0
+CAMERA_ID = 1
+DEVICE = 'gpu'
 
 selectedFilters = {"nose": None, "eye": None, "ear": None}
 
@@ -33,6 +34,7 @@ class Worker(QThread):
     cap = cv2.VideoCapture(CAMERA_ID)
     sinOut = pyqtSignal()
     data = None
+    twh = maghsk.twh(mo=DEVICE)
 
     def __init__(self, typ):
         super(Worker, self).__init__()
@@ -55,7 +57,7 @@ class Worker(QThread):
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
                 # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_HSV2RGB)
-                self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
+                self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters)
                 self.sinOut.emit()
         elif self.typ == "photo":
             if not self.qinding:
@@ -74,7 +76,7 @@ class Worker(QThread):
                 self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 self.raw_image = fit_to_480x640(self.raw_image)
 
-            self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
+            self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters)
             self.sinOut.emit()
 
 
