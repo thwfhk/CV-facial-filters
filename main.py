@@ -1,54 +1,36 @@
 import sys
-import cv2
+# import cv2
 import qdarkstyle
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-import numpy as np
+# from PyQt5.QtGui import *
+# import numpy as np
 
 import a_mobilenetv2 as twh
 import filters
 
-import time
+# import time
+import filetype
+
+from GUIutils import *
 
 
 from ui import Ui_Dialog
 
+CAMERA_ID = 1
 
 selectedFilters = {"nose": None, "eye": None, "ear": None}
-
-
-def npy2qpm(opencv_img):
-    img = opencv_img.copy()
-    #img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
-    #img = opencv_img.copy()[:,:,::-1]
-    showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
-    return QPixmap.fromImage(showImage)
 
 class FilterClass(QListWidgetItem):
     def __init__(self, name, typ, text, img_path):
         super(FilterClass, self).__init__(text)
-        # print(name, typ, text, img)
         self.setIcon(QIcon(img_path))
         self.setText(text)
         self.name = name
         self.typ = typ
 
-def fit_to_480x640(img):
-    if img.shape[0] < 480:
-        delta1 = int((480 - img.shape[0]) / 2)
-        delta2 = 480 - img.shape[0] - delta1
-        img = np.concatenate((np.zeros((delta1, img.shape[1], 3)).astype("uint8"), img, np.zeros((delta2, img.shape[1], 3)).astype("uint8")), axis=0)
-    if img.shape[1] < 640:
-        delta1 = int((640 - img.shape[1]) / 2)
-        delta2 = 640 - img.shape[1] - delta1
-        img = np.concatenate((np.zeros((img.shape[0], delta1, 3)).astype("uint8"), img, np.zeros((img.shape[0], delta2, 3)).astype("uint8")), axis=1)
-    return img
-
-
-
 class Worker(QThread):
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(CAMERA_ID)
     sinOut = pyqtSignal()
     data = None
 
@@ -70,6 +52,9 @@ class Worker(QThread):
             while self.keep_running:
                 _, self.raw_image = self.cap.read()
                 self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
+                # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
+                # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])
+                # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_HSV2RGB)
                 self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
                 self.sinOut.emit()
         elif self.typ == "photo":
@@ -85,13 +70,33 @@ class Worker(QThread):
                 else:
                     new_w = 640
                     new_h = int(new_w * (h/w))
-                print((new_h, new_w))
 
                 self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 self.raw_image = fit_to_480x640(self.raw_image)
 
             self.data = twh.addFilters(self.raw_image.copy(), selectedFilters)
             self.sinOut.emit()
+
+
+class Whiter(QThread):
+    def __init__(self, wdg):
+        super(Whiter, self).__init__()
+        self.wdg = wdg
+        self.pxm = QPixmap(640, 480)
+
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        delta = 0.1 / 255.0
+        cur = 255
+        for _ in range(255):
+            self.pxm.fill(QColor(255, 255, 255, cur))
+            self.wdg.setPixmap(self.pxm)
+            cur -= 1
+            time.sleep(delta)
+        self.wdg.clear()
 
 
 class Main_Form(QDialog):
@@ -103,12 +108,15 @@ class Main_Form(QDialog):
         super(Main_Form, self).__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.ui.picture.installEventFilter(self)
+        self.ui.white.installEventFilter(self)
         self.video = False
         self.photo = False
+        self.capture = False
 
-        self.play_green = QIcon('play-green.png')
-        self.play_gray = QIcon('play-gray.png')
+        self.play_green = QIcon()
+        self.play_green.addPixmap(QPixmap("play-green.svg"), QIcon.Normal, QIcon.Off)
+        self.play_gray = QIcon()
+        self.play_gray.addPixmap(QPixmap("play-gray.svg"), QIcon.Normal, QIcon.Off)
 
         self.ui.cameraButton.setIcon(self.play_gray)
 
@@ -123,11 +131,26 @@ class Main_Form(QDialog):
         self.ui.eyeFilters.itemSelectionChanged.connect(self.eyeFiltersItemSelectionChanged)
         self.ui.earFilters.itemSelectionChanged.connect(self.earFiltersItemSelectionChanged)
 
+        self.whiterThread = Whiter(self.ui.white)
+        self.ui.captureButton.clicked.connect(self.captureButtonClicked)
+        self.ui.white.setAttribute(Qt.WA_TranslucentBackground)
+
+
+    def captureButtonClicked(self):
+        self.whiterThread.start()
+        if self.video:
+            self.capture = True
+        elif self.photo:
+            save_image(self.photoThread.data)
+
     def photoCallback(self):
         self.updatePicture(self.photoThread.data)
 
     def cameraCallback(self):
         self.updatePicture(self.cameraThread.data)
+        if self.capture:
+            save_image(self.cameraThread.data)
+            self.capture = False
 
     def cameraButtonClicked(self):
         if self.video:
@@ -168,14 +191,24 @@ class Main_Form(QDialog):
             self.photoThread.start()
 
     def eventFilter(self, source, e):
-        if source is self.ui.picture:
+        if source is self.ui.white:
             if e.type() == QEvent.DragEnter:
                 if self.video:
                     e.ignore()
-                if e.mimeData().hasUrls():
-                    if len(e.mimeData().urls()) == 1:
+                else:
+                    if e.mimeData().hasUrls():
+                        if len(e.mimeData().urls()) != 1:
+                            e.ignore()
+                        else:
+                            kind = filetype.guess(e.mimeData().urls()[0].toLocalFile())
+                            if kind is None:
+                                e.ignore()
+                            elif kind.mime[:5] == 'image':
+                                e.accept()
+                            else:
+                                e.ignore()
+                    else:
                         e.ignore()
-                e.accept()
                 return True
 
             if e.type() == QEvent.Drop:
@@ -183,7 +216,6 @@ class Main_Form(QDialog):
                 self.video = False
                 self.ui.cameraButton.setIcon(self.play_gray)
                 self.photoThread.file_name = e.mimeData().urls()[0].toLocalFile()
-                print(self.photoThread.file_name)
                 self.photo = True
                 self.photoThread.run()
                 return True

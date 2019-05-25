@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1153</width>
-    <height>516</height>
+    <height>521</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,7 +26,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>185</y>
+     <y>175</y>
      <width>461</width>
      <height>100</height>
     </rect>
@@ -80,7 +80,7 @@
     <rect>
      <x>670</x>
      <y>440</y>
-     <width>461</width>
+     <width>221</width>
      <height>61</height>
     </rect>
    </property>
@@ -93,10 +93,6 @@
    <property name="text">
     <string/>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>play-arrow.svg</normaloff>play-arrow.svg</iconset>
-   </property>
    <property name="iconSize">
     <size>
      <width>30</width>
@@ -108,7 +104,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>325</y>
+     <y>315</y>
      <width>461</width>
      <height>100</height>
     </rect>
@@ -139,7 +135,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>45</y>
+     <y>35</y>
      <width>461</width>
      <height>100</height>
     </rect>
@@ -170,7 +166,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>10</y>
+     <y>0</y>
      <width>461</width>
      <height>31</height>
     </rect>
@@ -189,7 +185,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>150</y>
+     <y>140</y>
      <width>461</width>
      <height>31</height>
     </rect>
@@ -208,7 +204,7 @@
    <property name="geometry">
     <rect>
      <x>670</x>
-     <y>290</y>
+     <y>280</y>
      <width>461</width>
      <height>31</height>
     </rect>
@@ -221,6 +217,57 @@
    </property>
    <property name="text">
     <string>Nose Filters:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="captureButton">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>440</y>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei Mono</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>capture.svg</normaloff>capture.svg</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>30</width>
+     <height>30</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLabel" name="white">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>640</width>
+     <height>480</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>
