@@ -135,6 +135,9 @@ class Main_Form(QDialog):
         self.ui.captureButton.clicked.connect(self.captureButtonClicked)
         self.ui.white.setAttribute(Qt.WA_TranslucentBackground)
 
+        self.frame_count = 0
+        self.lst_time = time.time()
+
 
     def captureButtonClicked(self):
         self.whiterThread.start()
@@ -147,7 +150,12 @@ class Main_Form(QDialog):
         self.updatePicture(self.photoThread.data)
 
     def cameraCallback(self):
+        self.frame_count += 1
         self.updatePicture(self.cameraThread.data)
+        if self.frame_count == 10:
+            print("FPS:", 10.0 / (time.time() - self.lst_time))
+            self.frame_count = 0
+            self.lst_time = time.time()
         if self.capture:
             save_image(self.cameraThread.data.copy())
             self.capture = False
