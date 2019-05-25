@@ -61,19 +61,6 @@ def get_landmarks(img, predictor = predictor5): #in rgb
 
 @get_time
 def plot(img, face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes, selected_filters):
-    '''
-    for loc, points, P, pose, pts_3d, roi_box in zip(face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes):
-        (top, right, bottom, left) = loc
-        #cv2.rectangle(img, (left, top), (right, bottom), (0, 255, 0), 2)
-        for i in range(points.shape[1]):
-            x, y, z = points[0, i], points[1, i], points[2, i]
-            #cv2.circle(img, (x, y), 1, (255, 255, 255), 2)
-            # cv2.putText(img, str(i),(x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255),1,cv2.LINE_AA)
-        #img = filters.qwq(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_glass(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_ears(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_nose(img.copy(), points, P, pose, pts_3d, roi_box)
-    '''
     for P, pts_3d, roi_box in zip(Ps, pts_3ds, roi_boxes):
         img = filters.add_filters(img, P, pts_3d, roi_box, selected_filters)
     return img
