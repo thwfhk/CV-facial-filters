@@ -17,7 +17,7 @@ from GUIutils import *
 
 from ui import Ui_Dialog
 
-CAMERA_ID = 1
+CAMERA_ID = 0
 
 selectedFilters = {"nose": None, "eye": None, "ear": None}
 
