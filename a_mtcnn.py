@@ -26,6 +26,7 @@ predictor68 = dlib.shape_predictor("dlib_data/shape_predictor_68_face_landmarks.
 predictor5 = dlib.shape_predictor("dlib_data/shape_predictor_5_face_landmarks.dat")
 
 
+'''
 import kalman_3d
 kalman_list = []
 for i in range(68):
@@ -42,6 +43,7 @@ def use_kalman(pts_3d):
         new_pts[0][i], new_pts[1][i], new_pts[2][i] = x, y, z
     #print(np.array(pts_3d) - np.array(new_pts))
     return new_pts.copy()
+'''
 
 def calc(x, y, th1=20, th2=50):
     if abs(x-y) < th1:
@@ -132,7 +134,7 @@ def addFilters(frame, selected_filters):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    img_name_list = ["ts1.jpg", "s.jpg", "t.jpg"]
+    img_name_list = ["test_images/ts1.jpg", "test_images/s.jpg", "test_images/t.jpg"]
     for name in img_name_list:
         img = plt.imread(name)
         res = plot_landmarks(img, selected_filters)

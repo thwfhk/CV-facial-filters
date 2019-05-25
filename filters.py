@@ -39,6 +39,41 @@ def getAllFilters():
             li.append(Filter(filter_name, img.copy(), img_path, type))
     return li
 
+
+all_filters = {}
+class fff:
+    def __init__(self, fimg, finfo):
+        self.img = fimg
+        self.info = finfo
+
+for type, name_list in filter_list.items():
+    for filter_name in name_list:
+        str_card = type + filter_name
+        if type == "eye":
+            img = cv2.imread("./filters_image/" + type + "/" +filter_name+".png", cv2.IMREAD_UNCHANGED)
+            with open("./filters_image/eye/"+filter_name+".txt", "r") as f:
+                cx, cy, ratio = f.readline().split()
+                cx, cy, ratio = int(cx), int(cy), float(ratio)
+            all_filters[str_card] = fff(img, (cx, cy, ratio))
+        elif type == "nose":
+            img = cv2.imread("./filters_image/" + type + "/" +filter_name+".png", cv2.IMREAD_UNCHANGED)
+            with open("./filters_image/nose/"+filter_name+".txt", "r") as f:
+                cx, cy, ratio = f.readline().split()
+                cx, cy, ratio = int(cx), int(cy), float(ratio)
+            all_filters[str_card] = fff(img, (cx, cy, ratio))
+        elif type == "ear":
+            img1 = cv2.imread("./filters_image/ear/"+filter_name+"_left.png", cv2.IMREAD_UNCHANGED)
+            img2 = cv2.imread("./filters_image/ear/"+filter_name+"_right.png", cv2.IMREAD_UNCHANGED)
+            with open("./filters_image/ear/"+filter_name+".txt", "r") as f:
+                cx1, cy1, ratio1 = f.readline().split()
+                cx2, cy2, ratio2 = f.readline().split()
+                cx1, cy1, cx2, cy2 = int(cx1), int(cy1), int(cx2), int(cy2)
+                ratio1, ratio2 = float(ratio1), float(ratio2)
+            all_filters[str_card] = fff((img1, img2), (cx1, cy1, ratio1, cx2, cy2, ratio2))
+print("hi")
+
+
+        
 def add_filters(img, P, pts_3d, roi_box, selected_filters):
     if "ear" in selected_filters and selected_filters["ear"] != None:
         img = wear_ears(img.copy(), P, pts_3d, roi_box, selected_filters["ear"])
@@ -50,14 +85,12 @@ def add_filters(img, P, pts_3d, roi_box, selected_filters):
 
 # points: 2d侧脸68点, P: matrix, pose: euler angle, pts_3d: 3d正脸68点 已经scale到图片尺寸,roi_box: 
 def wear_glass(img, P, pts_3d, roi_box, filter_name):
-    fimg = cv2.imread("./filters_image/eye/"+filter_name+".png", cv2.IMREAD_UNCHANGED)
+
+    fimg = all_filters["eye"+filter_name].img.copy()
+    cx, cy, ratio = all_filters["eye"+filter_name].info
+
     fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
     fh, fw  = fimg.shape[:2]
-
-    # 读取glass对应点
-    with open("./filters_image/eye/"+filter_name+".txt", "r") as f:
-        cx, cy, ratio = f.readline().split()
-        cx, cy, ratio = int(cx), int(cy), float(ratio)
 
     w = (pts_3d[0][16] - pts_3d[0][0]) * ratio
     h = w * (fh/fw)
@@ -91,17 +124,14 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
     return img
 
 def wear_ears(img, P, pts_3d, roi_box, filter_name):
-    fimg1 = cv2.imread("./filters_image/ear/"+filter_name+"_left.png", cv2.IMREAD_UNCHANGED)
-    fimg2 = cv2.imread("./filters_image/ear/"+filter_name+"_right.png", cv2.IMREAD_UNCHANGED)
+    fimg1, fimg2 = all_filters["ear"+filter_name].img
+    fimg1 = fimg1.copy()
+    fimg2 = fimg2.copy()
+    cx1, cy1, ratio1, cx2, cy2, ratio2 = all_filters["ear"+filter_name].info
+
     fimg1[:, :, [0, 2]] = fimg1[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
     fimg2[:, :, [0, 2]] = fimg2[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
 
-    # ear的两个基点
-    with open("./filters_image/ear/"+filter_name+".txt", "r") as f:
-        cx1, cy1, ratio1 = f.readline().split()
-        cx2, cy2, ratio2 = f.readline().split()
-        cx1, cy1, cx2, cy2 = int(cx1), int(cy1), int(cx2), int(cy2)
-        ratio1, ratio2 = float(ratio1), float(ratio2)
 
     for i in range(2):
         if i==0:
@@ -148,15 +178,12 @@ def wear_ears(img, P, pts_3d, roi_box, filter_name):
     return img
 
 def wear_nose(img, P, pts_3d, roi_box, filter_name):
-    filter_name = "cat_nose"
-    fimg = cv2.imread("./filters_image/nose/"+filter_name+".png", cv2.IMREAD_UNCHANGED)
+    fimg = all_filters["nose"+filter_name].img.copy()
+    cx, cy, ratio = all_filters["nose"+filter_name].info
+
     fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
     fh, fw  = fimg.shape[:2]
 
-    # 读取nose对应点
-    with open("./filters_image/nose/"+filter_name+".txt", "r") as f:
-        cx, cy, ratio = f.readline().split()
-        cx, cy, ratio = int(cx), int(cy), float(ratio)
 
     w = (pts_3d[0][16] - pts_3d[0][0]) * ratio
     h = w * (fh/fw)
@@ -188,6 +215,7 @@ def wear_nose(img, P, pts_3d, roi_box, filter_name):
     return img
  
 
+'''
 def calc_dist(p1, p2):
     return np.sqrt((p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]))
  
@@ -220,3 +248,4 @@ def wear_glass_old(img, p, filter_name): #image, points_5, filter_image
     glass = glass[:,:,:3] # convert to 3 channels
     img[r1:r2, c1:c2][transparent] = glass[transparent]
     return img
+'''
