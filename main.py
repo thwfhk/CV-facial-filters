@@ -141,7 +141,7 @@ class Main_Form(QDialog):
         if self.video:
             self.capture = True
         elif self.photo:
-            save_image(self.photoThread.data)
+            save_image(self.photoThread.data.copy())
 
     def photoCallback(self):
         self.updatePicture(self.photoThread.data)
@@ -149,7 +149,7 @@ class Main_Form(QDialog):
     def cameraCallback(self):
         self.updatePicture(self.cameraThread.data)
         if self.capture:
-            save_image(self.cameraThread.data)
+            save_image(self.cameraThread.data.copy())
             self.capture = False
 
     def cameraButtonClicked(self):
@@ -252,6 +252,8 @@ if __name__ == '__main__':
     form.ui.eyeFilters.addItem(FilterClass(text="eye", name="eye", img=img, typ="eye"))
     form.ui.earFilters.addItem(FilterClass(text="ear", name="ear", img=img, typ="ear"))
     """
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    # qss_file = open('./qss/psblack.css').read()
+    # app.setStyleSheet(qss_file)
     form.show()
 sys.exit(app.exec_())
