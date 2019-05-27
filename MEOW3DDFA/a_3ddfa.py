@@ -81,7 +81,7 @@ class my3ddfa:
                 if self.device == 'gpu':
                     input = input.cuda()
                 param = self.model(input)  # NOTE: 输入图像是resize后的ROI
-                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
+                param = param.cpu().squeeze().numpy().flatten().astype(np.float32)
 
             # 68 pts
             pts68, pts_3d = predict_68pts(param, roi_box)

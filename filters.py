@@ -70,7 +70,6 @@ for type, name_list in filter_list.items():
                 cx1, cy1, cx2, cy2 = int(cx1), int(cy1), int(cx2), int(cy2)
                 ratio1, ratio2 = float(ratio1), float(ratio2)
             all_filters[str_card] = fff((img1, img2), (cx1, cy1, ratio1, cx2, cy2, ratio2))
-print("hi")
 
 
         
