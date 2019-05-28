@@ -143,4 +143,4 @@ if __name__ == '__main__':
         res = plot_landmarks(img, selected_filters)
         plt.imshow(res)
         plt.show()
-        plt.imsave(name+"_res.png", res)
+        plt.imsave("test_results/"+name[:-4]+"_res.png", res)
