@@ -1,8 +1,6 @@
 from PIL import Image
 import cv2
-import numpy as np 
-import math
-#import matplotlib.image as mpimg
+import numpy as np
 
 class Filter:
     def __init__(self, fname=None, fimg=None, fimg_path=None, ftype=None):
@@ -12,9 +10,9 @@ class Filter:
         self.type = ftype
 
 filter_list = {}
-filter_list["eye"] = ["glass"]
-filter_list["ear"] = ["rabbit_ear"]
-filter_list["nose"] = ["cat_nose"]
+filter_list["eye"] = ["glass", "eye1", "eye2"]
+filter_list["ear"] = ["rabbit_ear", "ear1", "ear2"]
+filter_list["nose"] = ["cat_nose", "nose1", "nose2"]
 
 def padding2square(img):
     h, w = img.shape[:2]
@@ -82,13 +80,13 @@ def add_filters(img, P, pts_3d, roi_box, selected_filters):
         img = wear_nose(img, P, pts_3d, roi_box, selected_filters["nose"])
     return img
 
-# points: 2d侧脸68点, P: matrix, pose: euler angle, pts_3d: 3d正脸68点 已经scale到图片尺寸,roi_box: 
+# points: 2d侧脸68点, P: matrix, pose: euler angle, pts_3d: 3d正脸68点 已经scale到图片尺寸,roi_box:
 def wear_glass(img, P, pts_3d, roi_box, filter_name):
-
-    fimg = all_filters["eye"+filter_name].img.copy()
+    fimg = all_filters["eye"+filter_name].img
     cx, cy, ratio = all_filters["eye"+filter_name].info
 
-    fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
+    # fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
+    fimg = cv2.cvtColor(fimg, cv2.COLOR_BGRA2RGBA)
     fh, fw  = fimg.shape[:2]
 
     w = (pts_3d[0][16] - pts_3d[0][0]) * ratio
@@ -102,7 +100,7 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
     # NOTE: lt, lb, rb,  rt
     #p_3d = np.array([[x0-w, y0+h, z], [x0-w, y0-h, z], [x0+w, y0-h, z], [x0+w, y0+h, z]])
     p_3d = np.array(ori_list)
-    
+
     p_3d_homo = np.concatenate((p_3d, np.ones([p_3d.shape[0], 1])), axis=1)
     p_2d = (p_3d_homo @ P.T)[:, :2]
 
@@ -125,12 +123,14 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
 
 def wear_ears(img, P, pts_3d, roi_box, filter_name):
     fimg1, fimg2 = all_filters["ear"+filter_name].img
-    fimg1 = fimg1.copy()
-    fimg2 = fimg2.copy()
+    # fimg1 = fimg1.copy()
+    # fimg2 = fimg2.copy()
     cx1, cy1, ratio1, cx2, cy2, ratio2 = all_filters["ear"+filter_name].info
 
-    fimg1[:, :, [0, 2]] = fimg1[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
-    fimg2[:, :, [0, 2]] = fimg2[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
+    fimg1 = cv2.cvtColor(fimg1, cv2.COLOR_BGRA2RGBA) # bgr_alpha -> rgb_alpha
+    fimg2 = cv2.cvtColor(fimg2, cv2.COLOR_BGRA2RGBA) # bgr_alpha -> rgb_alpha
+    # fimg1[:, :, [0, 2]] = fimg1[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
+    # fimg2[:, :, [0, 2]] = fimg2[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
 
 
     for i in range(2):
@@ -141,7 +141,7 @@ def wear_ears(img, P, pts_3d, roi_box, filter_name):
             x0, y0 = pts_3d[0][19], pts_3d[1][19]
         else:
             fh, fw =  fimg2.shape[:2]
-            cx, cy, ratio = cx2, cy2, ratio2 
+            cx, cy, ratio = cx2, cy2, ratio2
             face_h = pts_3d[1][8] - pts_3d[1][24]
             x0, y0 = pts_3d[0][24], pts_3d[1][24]
 
@@ -177,11 +177,14 @@ def wear_ears(img, P, pts_3d, roi_box, filter_name):
 
     return img
 
+from time import time
+
 def wear_nose(img, P, pts_3d, roi_box, filter_name):
-    fimg = all_filters["nose"+filter_name].img.copy()
+    fimg = all_filters["nose"+filter_name].img #.copy()
     cx, cy, ratio = all_filters["nose"+filter_name].info
 
-    fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
+    fimg = cv2.cvtColor(fimg, cv2.COLOR_BGRA2RGBA) # bgr_alpha -> rgb_alpha
+    # fimg[:, :, [0, 2]] = fimg[:, :, [2, 0]] # bgr_alpha -> rgb_alpha
     fh, fw  = fimg.shape[:2]
 
 
@@ -203,6 +206,7 @@ def wear_nose(img, P, pts_3d, roi_box, filter_name):
     scale_y = (ey - sy) / 120
     p_2d[:, 0] = p_2d[:, 0] * scale_x + sx
     p_2d[:, 1] = p_2d[:, 1] * scale_y + sy
+
 
     p_fimg = np.array(new_list)
     M = cv2.getPerspectiveTransform(p_fimg[:4].astype('float32'), p_2d[:4].astype('float32'))

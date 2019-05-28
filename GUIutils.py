@@ -11,14 +11,14 @@ def npy2qpm(opencv_img):
     showImage = QImage(img.data, img.shape[1], img.shape[0], QImage.Format_RGB888)
     return QPixmap.fromImage(showImage)
 
-def fit_to_480x640(img):
-    if img.shape[0] < 480:
-        delta1 = int((480 - img.shape[0]) / 2)
-        delta2 = 480 - img.shape[0] - delta1
+def fit_to_480x640(img, PIC_WIDTH, PIC_HEIGHT):
+    if img.shape[0] < PIC_HEIGHT:
+        delta1 = int((PIC_HEIGHT - img.shape[0]) / 2)
+        delta2 = PIC_HEIGHT - img.shape[0] - delta1
         img = np.concatenate((np.zeros((delta1, img.shape[1], 3)).astype("uint8"), img, np.zeros((delta2, img.shape[1], 3)).astype("uint8")), axis=0)
-    if img.shape[1] < 640:
-        delta1 = int((640 - img.shape[1]) / 2)
-        delta2 = 640 - img.shape[1] - delta1
+    if img.shape[1] < PIC_WIDTH:
+        delta1 = int((PIC_WIDTH - img.shape[1]) / 2)
+        delta2 = PIC_WIDTH - img.shape[1] - delta1
         img = np.concatenate((np.zeros((img.shape[0], delta1, 3)).astype("uint8"), img, np.zeros((img.shape[0], delta2, 3)).astype("uint8")), axis=1)
     return img
 

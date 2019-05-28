@@ -19,6 +19,8 @@ from ui import Ui_Dialog
 
 CAMERA_ID = 1
 DEVICE = 'gpu'
+PIC_WIDTH = 1200
+PIC_HEIGHT = 900
 
 selectedFilters = {"nose": None, "eye": None, "ear": None}
 
@@ -62,19 +64,22 @@ class Worker(QThread):
         elif self.typ == "photo":
             if not self.qinding:
                 self.raw_image = cv2.imread(self.file_name)
+                if self.raw_image is None:
+                    return
+
                 self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
                 self.raw_image = self.raw_image[:,::-1,:]
 
                 h, w = self.raw_image.shape[:2]
-                if h/w >= 480/640:
-                    new_h = 480
+                if h/w >= PIC_HEIGHT/PIC_WIDTH:
+                    new_h = PIC_HEIGHT
                     new_w = int(new_h * (w/h))
                 else:
-                    new_w = 640
+                    new_w = PIC_WIDTH
                     new_h = int(new_w * (h/w))
 
                 self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-                self.raw_image = fit_to_480x640(self.raw_image)
+                self.raw_image = fit_to_480x640(self.raw_image, PIC_WIDTH, PIC_HEIGHT)
 
             self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters)
             self.sinOut.emit()
@@ -84,7 +89,7 @@ class Whiter(QThread):
     def __init__(self, wdg):
         super(Whiter, self).__init__()
         self.wdg = wdg
-        self.pxm = QPixmap(640, 480)
+        self.pxm = QPixmap(PIC_WIDTH, PIC_HEIGHT)
 
 
     def __del__(self):
@@ -233,7 +238,10 @@ class Main_Form(QDialog):
         return QDialog.eventFilter(self, source, e)
 
     def updatePicture(self, opencv_img):
+        if opencv_img.shape[0] != PIC_WIDTH and opencv_img.shape[1] != PIC_HEIGHT:
+            opencv_img = cv2.resize(opencv_img, (PIC_WIDTH, PIC_HEIGHT), interpolation=cv2.INTER_LINEAR)
         self.ui.picture.setPixmap(npy2qpm(opencv_img))
+
 
 
 import matplotlib.pyplot as plt

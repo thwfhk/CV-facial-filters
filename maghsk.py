@@ -6,6 +6,7 @@ import dlib
 from MEOW3DDFA import a_3ddfa
 import filters
 
+
 class twh:
     def __init__(self, mo='gpu'):
         self.detector = mbn.get_detector()
@@ -52,4 +53,5 @@ class twh:
     def addFilters(self, frame, selected_filters):
         frame = frame[:, ::-1, :]
         awsl = self.get_landmarks(frame)
-        return self.plot(frame, *awsl, selected_filters)
+        res = self.plot(frame, *awsl, selected_filters)
+        return res
