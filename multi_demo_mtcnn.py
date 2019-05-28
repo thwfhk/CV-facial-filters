@@ -32,8 +32,8 @@ selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
 
 # A subprocess use to capture frames.
 def capture(read_frame_list):
-    video_capture = cv2.VideoCapture(0)
-    #video_capture = cv2.VideoCapture('1.mp4')
+    #video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture('test_images/1.mp4')
     # video_capture.set(5, 30) # Frame rate.
     print("Width: %d, Height: %d, FPS: %d" % (720, 720, video_capture.get(5)))
 

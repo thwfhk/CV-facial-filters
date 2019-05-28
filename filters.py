@@ -93,7 +93,8 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
 
     w = (pts_3d[0][16] - pts_3d[0][0]) * ratio
     h = w * (fh/fw)
-    z = (pts_3d[2][39] + pts_3d[2][27] + pts_3d[2][42])/3
+    #z = (pts_3d[2][39] + pts_3d[2][27] + pts_3d[2][42])/3
+    z = pts_3d[2][27]
     x0, y0 = pts_3d[0][27], pts_3d[1][27]
 
     ori_list = [[x0, y0, z], [x0-w/2, y0+h*(cy/fh), z], [x0-w/2, y0-h*(1-cy/fh), z], [x0+w/2, y0, z]]

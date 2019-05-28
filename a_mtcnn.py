@@ -72,7 +72,7 @@ landmarkor = a_3ddfa.my3ddfa('cpu')
 
 @get_time
 def get_landmarks(img, predictor = predictor5): #in rgb
-    floc, fslands = mtcnn.detect_faces(Image.fromarray(img), min_face_size=100)
+    floc, fslands = mtcnn.detect_faces(Image.fromarray(img.copy()), min_face_size=80)
     face_locations = []
     faces_landmarks = []
     faceRects = []
@@ -134,9 +134,13 @@ def addFilters(frame, selected_filters):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    img_name_list = ["test_images/ts1.jpg", "test_images/s.jpg", "test_images/t.jpg"]
+    img_name_list = ["cha1.jpg", "cha2.jpg", "ts1.jpg", "ts2.jpg", "ts3.jpg", "tc1.jpg"]
+    img_name_list = ["tc2.png", "tc3.png", "tc4.png", "tc5.png", "b1.jpg", "b2.jpg"]
+    img_name_list = ["cha1.jpg", "cha3.jpg", "cha4.jpg", "s.jpg", "t.jpg"]
     for name in img_name_list:
-        img = plt.imread(name)
+        img = cv2.imread("test_images/" + name)[:,:,::-1]
+        print(img.shape)
         res = plot_landmarks(img, selected_filters)
         plt.imshow(res)
         plt.show()
+        plt.imsave(name+"_res.png", res)
