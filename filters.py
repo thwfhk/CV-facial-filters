@@ -115,11 +115,13 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
     M = cv2.getPerspectiveTransform(p_fimg[:4].astype('float32'), p_2d[:4].astype('float32'))
     glass = cv2.warpPerspective(fimg, M, img.shape[:2][::-1])
 
+    transparent = glass[:,:,3] != 0
     alpha = (glass[:,:,3].astype("float32") / 255).reshape(glass.shape[0], glass.shape[1], 1)
-    glass = glass[:,:,:3] * alpha
-    img = img * (1-alpha)
-    img = (img + glass).astype("uint8")
-    #transparent = glass[:,:,3] != 0
+    glass = glass[:,:,:3]
+    glass[transparent] = glass[transparent] * alpha[transparent]
+    img[transparent] = img[transparent] * (1-alpha[transparent])
+    img[transparent] = (img[transparent] + glass[transparent]).astype("uint8")
+    #img = (glass[:,:,:3] * alpha + img * (1-alpha)).astype("uint8")
     #glass = glass[:,:,:3] # convert to 3 channels
     #img[:, :][transparent] = glass[transparent]
 
@@ -175,10 +177,13 @@ def wear_ears(img, P, pts_3d, roi_box, filter_name):
         else:
             ear = cv2.warpPerspective(fimg2, M, img.shape[:2][::-1])
 
+
+        transparent = ear[:,:,3] != 0
         alpha = (ear[:,:,3].astype("float32") / 255).reshape(ear.shape[0], ear.shape[1], 1)
-        ear = ear[:,:,:3] * alpha
-        img = img * (1-alpha)
-        img = (img + ear).astype("uint8")
+        ear = ear[:,:,:3]
+        ear[transparent] = ear[transparent] * alpha[transparent]
+        img[transparent] = img[transparent] * (1-alpha[transparent])
+        img[transparent] = (img[transparent] + ear[transparent]).astype("uint8")
         #transparent = ear[:,:,3] != 0
         #ear = ear[:,:,:3] # convert to 3 channels
         #img[:, :][transparent] = ear[transparent]
@@ -220,10 +225,13 @@ def wear_nose(img, P, pts_3d, roi_box, filter_name):
     M = cv2.getPerspectiveTransform(p_fimg[:4].astype('float32'), p_2d[:4].astype('float32'))
     nose = cv2.warpPerspective(fimg, M, img.shape[:2][::-1])
 
+
+    transparent = nose[:,:,3] != 0
     alpha = (nose[:,:,3].astype("float32") / 255).reshape(nose.shape[0], nose.shape[1], 1)
-    nose = nose[:,:,:3] * alpha
-    img = img * (1-alpha)
-    img = (img + nose).astype("uint8")
+    nose = nose[:,:,:3]
+    nose[transparent] = nose[transparent] * alpha[transparent]
+    img[transparent] = img[transparent] * (1-alpha[transparent])
+    img[transparent] = (img[transparent] + nose[transparent]).astype("uint8")
     #transparent = glass[:,:,3] != 0
     #glass = glass[:,:,:3] # convert to 3 channels
     #img[:, :][transparent] = glass[transparent]
