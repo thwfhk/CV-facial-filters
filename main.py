@@ -22,7 +22,7 @@ DEVICE = 'gpu'
 PIC_WIDTH = 1200
 PIC_HEIGHT = 900
 
-selectedFilters = {"nose": None, "eye": None, "ear": None}
+selectedFilters = {}
 
 class FilterClass(QListWidgetItem):
     def __init__(self, name, typ, text, img_path):
@@ -55,11 +55,11 @@ class Worker(QThread):
         if self.typ == "camera":
             while self.keep_running:
                 _, self.raw_image = self.cap.read()
-                self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
+                # self.raw_image = self.raw_image[:,:,::-1]
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
                 # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_HSV2RGB)
-                self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters)
+                self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters, fancy_mode=form.ui.checkBox.isChecked())
                 self.sinOut.emit()
         elif self.typ == "photo":
             if not self.qinding:
@@ -67,8 +67,8 @@ class Worker(QThread):
                 if self.raw_image is None:
                     return
 
-                self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
-                self.raw_image = self.raw_image[:,::-1,:]
+                # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2RGB)
+                # self.raw_image = self.raw_image[:,::-1,:]
 
                 h, w = self.raw_image.shape[:2]
                 if h/w >= PIC_HEIGHT/PIC_WIDTH:
@@ -80,8 +80,7 @@ class Worker(QThread):
 
                 self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 self.raw_image = fit_to_480x640(self.raw_image, PIC_WIDTH, PIC_HEIGHT)
-
-            self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters)
+            self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters, bbox_steps='two', mirroring=self.qinding, fancy_mode=form.ui.checkBox.isChecked())
             self.sinOut.emit()
 
 
@@ -96,7 +95,7 @@ class Whiter(QThread):
         self.wait()
 
     def run(self):
-        delta = 0.1 / 255.0
+        delta = 0.06 / 255.0
         cur = 255
         for _ in range(255):
             self.pxm.fill(QColor(255, 255, 255, cur))
@@ -141,10 +140,14 @@ class Main_Form(QDialog):
         self.whiterThread = Whiter(self.ui.white)
         self.ui.captureButton.clicked.connect(self.captureButtonClicked)
         self.ui.white.setAttribute(Qt.WA_TranslucentBackground)
+        self.ui.checkBox.clicked.connect(self.checkBoxClicked)
 
         self.frame_count = 0
         self.lst_time = time.time()
 
+    def checkBoxClicked(self):
+        if not self.video and self.photo:
+            self.photoThread.start()
 
     def captureButtonClicked(self):
         self.whiterThread.start()
@@ -161,6 +164,7 @@ class Main_Form(QDialog):
         self.updatePicture(self.cameraThread.data)
         if self.frame_count == 10:
             print("FPS:", 10.0 / (time.time() - self.lst_time))
+            print(selectedFilters)
             self.frame_count = 0
             self.lst_time = time.time()
         if self.capture:
@@ -174,6 +178,7 @@ class Main_Form(QDialog):
             self.photo = True
             self.photoThread.raw_image = self.cameraThread.raw_image
             self.photoThread.qinding = True
+            self.photoThread.data = self.cameraThread.data
         else:
             self.ui.cameraButton.setIcon(self.play_green)
             self.photo = False
@@ -183,7 +188,7 @@ class Main_Form(QDialog):
 
     def noseFiltersItemSelectionChanged(self):
         if len(self.ui.noseFilters.selectedItems()) == 0:
-            selectedFilters["nose"] = None
+            selectedFilters.pop("nose")
         else:
             selectedFilters["nose"] = self.ui.noseFilters.selectedItems()[0].name
         if self.photo:
@@ -191,7 +196,7 @@ class Main_Form(QDialog):
 
     def earFiltersItemSelectionChanged(self):
         if len(self.ui.earFilters.selectedItems()) == 0:
-            selectedFilters["ear"] = None
+            selectedFilters.pop("ear")
         else:
             selectedFilters["ear"] = self.ui.earFilters.selectedItems()[0].name
         if self.photo:
@@ -199,7 +204,7 @@ class Main_Form(QDialog):
 
     def eyeFiltersItemSelectionChanged(self):
         if len(self.ui.eyeFilters.selectedItems()) == 0:
-            selectedFilters["eye"] = None
+            selectedFilters.pop("eye")
         else:
             selectedFilters["eye"] = self.ui.eyeFilters.selectedItems()[0].name
         if self.photo:

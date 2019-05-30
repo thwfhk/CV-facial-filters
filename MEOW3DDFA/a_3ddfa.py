@@ -4,19 +4,13 @@ import torch
 import torchvision.transforms as transforms
 import numpy as np
 import cv2
-import dlib
-import scipy.io as sio
-import argparse
 import torch.backends.cudnn as cudnn
 
 from .utils.ddfa import ToTensorGjz, NormalizeGjz, str2bool
 from . import mobilenet_v1
 from .utils.inference import get_suffix, parse_roi_box_from_landmark, crop_img, predict_68pts, dump_to_ply, dump_vertex, \
     draw_landmarks, predict_dense, parse_roi_box_from_bbox, get_colors, write_obj_with_colors
-from .utils.cv_plot import plot_pose_box
 from .utils.estimate_pose import parse_pose
-from .utils.render import get_depths_image, cget_depths_image, cpncc
-from .utils.paf import gen_img_paf
 
 STD_SIZE = 120
 
@@ -43,12 +37,9 @@ class my3ddfa:
             self.model = self.model.cuda()
         self.model.eval()
 
-        # 2. load dlib model for face detection and landmark used for face cropping
-        dlib_landmark_model = "./dlib_data/shape_predictor_68_face_landmarks.dat"
-        self.face_regressor = dlib.shape_predictor(dlib_landmark_model)
-
-    def meow_landmarks(self, img_ori, rects, use_landmarks=True, bbox_steps='one'):
-        img_ori = img_ori[:,:,::-1] #rgb->bgr
+    def meow_landmarks(self, img_ori, rects, bbox_steps='one'):
+        # img_ori = img_ori[:,:,::-1] #rgb->bgr
+        # img_ori = cv2.cvtColor(img_ori, cv2.COLOR_RGB2BGR)
 
         # 3. forward
         #tri = sio.loadmat('visualize/tri.mat')['tri']
@@ -61,16 +52,7 @@ class my3ddfa:
         roi_boxes = []
         for rect in rects:
             # whether use dlib landmark to crop image, if not, use only face bbox to calc roi bbox for cropping
-            if use_landmarks:
-                # - use landmark for cropping 
-                pts = self.face_regressor(img_ori, rect).parts()
-                pts = np.array([[pt.x, pt.y] for pt in pts]).T
-                roi_box = parse_roi_box_from_landmark(pts) #TODO: to read it 
-            else:
-                # - use detected face bbox
-                # use rects as bbox ang generate roi_bbox
-                bbox = [rect.left(), rect.top(), rect.right(), rect.bottom()]
-                roi_box = parse_roi_box_from_bbox(bbox) # square *1.58
+            roi_box = parse_roi_box_from_bbox((rect.left(), rect.top(), rect.right(), rect.bottom()))  # square *1.58
 
             img = crop_img(img_ori, roi_box)
 
@@ -81,7 +63,7 @@ class my3ddfa:
                 if self.device == 'gpu':
                     input = input.cuda()
                 param = self.model(input)  # NOTE: 输入图像是resize后的ROI
-                param = param.cpu().squeeze().numpy().flatten().astype(np.float32)
+                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
             # 68 pts
             pts68, pts_3d = predict_68pts(param, roi_box)
@@ -111,26 +93,4 @@ class my3ddfa:
 
             roi_boxes.append(roi_box)
 
-            ''' show 3d
-            import matplotlib.pyplot as plt
-            from mpl_toolkits.mplot3d import Axes3D
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            X = pts_3d[0]
-            Y = pts_3d[1]
-            Z = pts_3d[2]
-            ax.scatter(X, Y, Z)
-            plt.show()
-            '''
-
-        '''
-        img_pose = plot_pose_box(img_ori, Ps, pts_res)
-        #img_pose = qwq(img_ori, Ps, pts_res)
-        import matplotlib.pyplot as plt
-        plt.imshow(img_pose[:,:,::-1])
-        plt.show()
-        '''
         return pts_res, Ps, poses, pts_3ds, roi_boxes
-
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt

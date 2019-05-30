@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1733</width>
+    <width>1688</width>
     <height>942</height>
    </rect>
   </property>
@@ -433,9 +433,9 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>1250</x>
-     <y>225</y>
-     <width>461</width>
-     <height>100</height>
+     <y>305</y>
+     <width>421</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -490,7 +490,7 @@ QSlider::sub-page:vertical {
     <rect>
      <x>1250</x>
      <y>860</y>
-     <width>221</width>
+     <width>201</width>
      <height>61</height>
     </rect>
    </property>
@@ -517,9 +517,9 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>1250</x>
-     <y>385</y>
-     <width>461</width>
-     <height>100</height>
+     <y>545</y>
+     <width>421</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -552,8 +552,8 @@ QSlider::sub-page:vertical {
     <rect>
      <x>1250</x>
      <y>65</y>
-     <width>461</width>
-     <height>100</height>
+     <width>421</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -593,7 +593,7 @@ QSlider::sub-page:vertical {
    <property name="font">
     <font>
      <family>Microsoft YaHei Mono</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -604,7 +604,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>1250</x>
-     <y>190</y>
+     <y>270</y>
      <width>461</width>
      <height>31</height>
     </rect>
@@ -612,7 +612,7 @@ QSlider::sub-page:vertical {
    <property name="font">
     <font>
      <family>Microsoft YaHei Mono</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -623,7 +623,7 @@ QSlider::sub-page:vertical {
    <property name="geometry">
     <rect>
      <x>1250</x>
-     <y>350</y>
+     <y>510</y>
      <width>461</width>
      <height>31</height>
     </rect>
@@ -631,7 +631,7 @@ QSlider::sub-page:vertical {
    <property name="font">
     <font>
      <family>Microsoft YaHei Mono</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -641,9 +641,9 @@ QSlider::sub-page:vertical {
   <widget class="QPushButton" name="captureButton">
    <property name="geometry">
     <rect>
-     <x>1490</x>
+     <x>1470</x>
      <y>860</y>
-     <width>221</width>
+     <width>201</width>
      <height>61</height>
     </rect>
    </property>
@@ -690,6 +690,28 @@ QSlider::sub-page:vertical {
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>1250</x>
+     <y>790</y>
+     <width>201</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft YaHei Mono</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Fancy Mode</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
