@@ -10,9 +10,9 @@ class Filter:
         self.type = ftype
 
 filter_list = {}
-filter_list["eye"] = ["glass", "eye1", "eye2"]
-filter_list["ear"] = ["rabbit_ear", "ear1", "ear2"]
-filter_list["nose"] = ["cat_nose", "nose1", "nose2"]
+filter_list["eye"] = ["glass", "eye1", "eye2", "eye3", "mojing"]
+filter_list["ear"] = ["rabbit_ear", "ear1", "ear2", "ear3"]
+filter_list["nose"] = ["cat_nose", "nose1", "nose2", "nose3", "nose4", "nose5"]
 
 def padding2square(img):
     h, w = img.shape[:2]
@@ -115,9 +115,13 @@ def wear_glass(img, P, pts_3d, roi_box, filter_name):
     M = cv2.getPerspectiveTransform(p_fimg[:4].astype('float32'), p_2d[:4].astype('float32'))
     glass = cv2.warpPerspective(fimg, M, img.shape[:2][::-1])
 
-    transparent = glass[:,:,3] != 0
-    glass = glass[:,:,:3] # convert to 3 channels
-    img[:, :][transparent] = glass[transparent]
+    alpha = (glass[:,:,3].astype("float32") / 255).reshape(glass.shape[0], glass.shape[1], 1)
+    glass = glass[:,:,:3] * alpha
+    img = img * (1-alpha)
+    img = (img + glass).astype("uint8")
+    #transparent = glass[:,:,3] != 0
+    #glass = glass[:,:,:3] # convert to 3 channels
+    #img[:, :][transparent] = glass[transparent]
 
     return img
 
@@ -171,9 +175,13 @@ def wear_ears(img, P, pts_3d, roi_box, filter_name):
         else:
             ear = cv2.warpPerspective(fimg2, M, img.shape[:2][::-1])
 
-        transparent = ear[:,:,3] != 0
-        ear = ear[:,:,:3] # convert to 3 channels
-        img[:, :][transparent] = ear[transparent]
+        alpha = (ear[:,:,3].astype("float32") / 255).reshape(ear.shape[0], ear.shape[1], 1)
+        ear = ear[:,:,:3] * alpha
+        img = img * (1-alpha)
+        img = (img + ear).astype("uint8")
+        #transparent = ear[:,:,3] != 0
+        #ear = ear[:,:,:3] # convert to 3 channels
+        #img[:, :][transparent] = ear[transparent]
 
     return img
 
@@ -210,11 +218,15 @@ def wear_nose(img, P, pts_3d, roi_box, filter_name):
 
     p_fimg = np.array(new_list)
     M = cv2.getPerspectiveTransform(p_fimg[:4].astype('float32'), p_2d[:4].astype('float32'))
-    glass = cv2.warpPerspective(fimg, M, img.shape[:2][::-1])
+    nose = cv2.warpPerspective(fimg, M, img.shape[:2][::-1])
 
-    transparent = glass[:,:,3] != 0
-    glass = glass[:,:,:3] # convert to 3 channels
-    img[:, :][transparent] = glass[transparent]
+    alpha = (nose[:,:,3].astype("float32") / 255).reshape(nose.shape[0], nose.shape[1], 1)
+    nose = nose[:,:,:3] * alpha
+    img = img * (1-alpha)
+    img = (img + nose).astype("uint8")
+    #transparent = glass[:,:,3] != 0
+    #glass = glass[:,:,:3] # convert to 3 channels
+    #img[:, :][transparent] = glass[transparent]
 
     return img
  
