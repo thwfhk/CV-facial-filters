@@ -6,7 +6,8 @@ from PyQt5.QtCore import *
 # from PyQt5.QtGui import *
 # import numpy as np
 
-import maghsk
+#import maghsk
+import a_fb as maghsk
 import filters
 
 # import time
@@ -17,10 +18,10 @@ from GUIutils import *
 
 from ui import Ui_Dialog
 
-CAMERA_ID = 1
-DEVICE = 'gpu'
-PIC_WIDTH = 1200
-PIC_HEIGHT = 900
+CAMERA_ID = 0
+DEVICE = 'cpu'
+PIC_WIDTH = 720
+PIC_HEIGHT = 720
 
 selectedFilters = {}
 
@@ -31,6 +32,12 @@ class FilterClass(QListWidgetItem):
         self.setText(text)
         self.name = name
         self.typ = typ
+
+
+w, h = 1280, 720
+x = (w-h)//2
+mask = np.zeros((h, w, 3), dtype='bool')
+mask[:, x:w-x, :] = True
 
 class Worker(QThread):
     cap = cv2.VideoCapture(CAMERA_ID)
@@ -55,6 +62,7 @@ class Worker(QThread):
         if self.typ == "camera":
             while self.keep_running:
                 _, self.raw_image = self.cap.read()
+                self.raw_image = self.raw_image[mask].reshape(720, 720, 3)
                 # self.raw_image = self.raw_image[:,:,::-1]
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
                 # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])

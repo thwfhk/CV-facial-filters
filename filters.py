@@ -77,7 +77,7 @@ for type, name_list in filter_list.items():
             all_filters[str_card] = fff((img1, img2), (cx1, cy1, ratio1, cx2, cy2, ratio2))
 
 
-def add_filters(img, P, pts_3d, roi_box, selected_filters, fancy_mode):
+def add_filters(img, P, pts_3d, roi_box, selected_filters, fancy_mode=False):
     if "ear" in selected_filters and selected_filters["ear"] != None:
         img = wear_ears(img, P, pts_3d, roi_box, selected_filters["ear"], fancy_mode)
     if "eye" in selected_filters and selected_filters["eye"] != None:
@@ -245,6 +245,9 @@ def wear_nose(img, P, pts_3d, roi_box, filter_name, fancy_mode):
 
     return img
 
+#def show_face(pts_3d):
+
+    
 
 '''
 def calc_dist(p1, p2):

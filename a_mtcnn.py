@@ -100,21 +100,25 @@ def get_landmarks(img, predictor = predictor5): #in rgb
 
 @get_time
 def plot(img, face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes, selected_filters):
-    '''
+    
     for loc, points, P, pose, pts_3d, roi_box in zip(face_locations, faces_landmarks, Ps, poses, pts_3ds, roi_boxes):
         (top, right, bottom, left) = loc
-        #cv2.rectangle(img, (left, top), (right, bottom), (0, 255, 0), 2)
+        cv2.rectangle(img, (left, top), (right, bottom), (0, 255, 0), 2)
         for i in range(points.shape[1]):
             x, y, z = points[0, i], points[1, i], points[2, i]
-            #cv2.circle(img, (x, y), 1, (255, 255, 255), 2)
-            # cv2.putText(img, str(i),(x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255),1,cv2.LINE_AA)
-        #img = filters.qwq(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_glass(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_ears(img.copy(), points, P, pose, pts_3d, roi_box)
-        #img = filters.wear_nose(img.copy(), points, P, pose, pts_3d, roi_box)
-    '''
-    for P, pts_3d, roi_box in zip(Ps, pts_3ds, roi_boxes):
-        img = filters.add_filters(img, P, pts_3d, roi_box, selected_filters)
+            print(x, y, z)
+            #cv2.circle(img, (x, y), 1, (255, 255, 255), 2) 
+            cv2.putText(img, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1, cv2.LINE_AA)
+    
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+    import matplotlib.pyplot as plt
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    x, y, z = pts_3d[0], pts_3d[1], pts_3d[2]
+    ax.scatter(x, y, z)
+    plt.show()
+    #for P, pts_3d, roi_box in zip(Ps, pts_3ds, roi_boxes):
+    #    img = filters.add_filters(img, P, pts_3d, roi_box, selected_filters)
     return img
 
 selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
@@ -137,10 +141,12 @@ if __name__ == '__main__':
     img_name_list = ["cha1.jpg", "cha2.jpg", "ts1.jpg", "ts2.jpg", "ts3.jpg", "tc1.jpg"]
     img_name_list = ["tc2.png", "tc3.png", "tc4.png", "tc5.png", "b1.jpg", "b2.jpg"]
     img_name_list = ["cha1.jpg", "cha3.jpg", "cha4.jpg", "s.jpg", "t.jpg"]
+    img_name_list = ["cha1.jpg", "cha2.jpg", "ts1.jpg", "ts2.jpg", "ts3.jpg", "tc1.jpg"]
+    img_name_list = ["ts1.jpg"]
     for name in img_name_list:
         img = cv2.imread("test_images/" + name)[:,:,::-1]
         print(img.shape)
-        res = plot_landmarks(img, selected_filters)
+        res = plot_landmarks(img.copy(), selected_filters)
         plt.imshow(res)
         plt.show()
         plt.imsave("test_results/"+name[:-4]+"_res.png", res)
