@@ -1,12 +1,12 @@
 import sys
 # import cv2
-import qdarkstyle
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 # from PyQt5.QtGui import *
 # import numpy as np
 
-#import maghsk
+# a_mbn is gpu, a_fb is cpu
+# import a_mbn as maghsk
 import a_fb as maghsk
 import filters
 
@@ -33,12 +33,6 @@ class FilterClass(QListWidgetItem):
         self.name = name
         self.typ = typ
 
-
-w, h = 1280, 720
-x = (w-h)//2
-mask = np.zeros((h, w, 3), dtype='bool')
-mask[:, x:w-x, :] = True
-
 class Worker(QThread):
     cap = cv2.VideoCapture(CAMERA_ID)
     sinOut = pyqtSignal()
@@ -62,7 +56,6 @@ class Worker(QThread):
         if self.typ == "camera":
             while self.keep_running:
                 _, self.raw_image = self.cap.read()
-                self.raw_image = self.raw_image[mask].reshape(720, 720, 3)
                 # self.raw_image = self.raw_image[:,:,::-1]
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
                 # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])

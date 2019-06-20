@@ -5,7 +5,6 @@ import torchvision.transforms as transforms
 import numpy as np
 import cv2
 import torch.backends.cudnn as cudnn
-import dlib
 
 from .utils.ddfa import ToTensorGjz, NormalizeGjz, str2bool
 from . import mobilenet_v1
@@ -38,11 +37,8 @@ class my3ddfa:
             self.model = self.model.cuda()
         self.model.eval()
 
-        dlib_landmark_model = "./dlib_data/shape_predictor_68_face_landmarks.dat"
-        self.face_regressor = dlib.shape_predictor(dlib_landmark_model)
-
     def meow_landmarks(self, img_ori, rects, bbox_steps='one'):
-        img_ori = img_ori[:,:,::-1] #rgb->bgr
+        # img_ori = img_ori[:,:,::-1] #rgb->bgr
         # img_ori = cv2.cvtColor(img_ori, cv2.COLOR_RGB2BGR)
 
         # 3. forward
@@ -54,21 +50,9 @@ class my3ddfa:
         poses = []  # pose collection, [todo: validate it]
         pts_3ds = [] # 三维正脸的68点
         roi_boxes = []
-
-        use_landmarks = False
         for rect in rects:
             # whether use dlib landmark to crop image, if not, use only face bbox to calc roi bbox for cropping
-            if use_landmarks:
-                # - use landmark for cropping 
-                pts = self.face_regressor(img_ori, rect).parts()
-                pts = np.array([[pt.x, pt.y] for pt in pts]).T
-                roi_box = parse_roi_box_from_landmark(pts) #TODO: to read it 
-            else:
-                # - use detected face bbox
-                # use rects as bbox ang generate roi_bbox
-                bbox = [rect.left(), rect.top(), rect.right(), rect.bottom()]
-                roi_box = parse_roi_box_from_bbox(bbox) # square *1.58
-            #roi_box = parse_roi_box_from_bbox((rect.left(), rect.top(), rect.right(), rect.bottom()))  # square *1.58
+            roi_box = parse_roi_box_from_bbox((rect.left(), rect.top(), rect.right(), rect.bottom()))  # square *1.58
 
             img = crop_img(img_ori, roi_box)
 
@@ -108,7 +92,5 @@ class my3ddfa:
             pts_3ds.append(pts_3d)
 
             roi_boxes.append(roi_box)
-
-
 
         return pts_res, Ps, poses, pts_3ds, roi_boxes
