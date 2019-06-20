@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file 'big-final.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(1688, 942)
+        Dialog.resize(1363, 720)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -424,7 +425,7 @@ class Ui_Dialog(object):
 "}\n"
 "")
         self.eyeFilters = QtWidgets.QListWidget(Dialog)
-        self.eyeFilters.setGeometry(QtCore.QRect(1250, 305, 421, 201))
+        self.eyeFilters.setGeometry(QtCore.QRect(740, 240, 620, 100))
         self.eyeFilters.setFocusPolicy(QtCore.Qt.NoFocus)
         self.eyeFilters.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.eyeFilters.setIconSize(QtCore.QSize(90, 90))
@@ -433,14 +434,14 @@ class Ui_Dialog(object):
         self.eyeFilters.setViewMode(QtWidgets.QListView.IconMode)
         self.eyeFilters.setObjectName("eyeFilters")
         self.picture = QtWidgets.QLabel(Dialog)
-        self.picture.setGeometry(QtCore.QRect(20, 20, 1200, 900))
+        self.picture.setGeometry(QtCore.QRect(0, 0, 720, 720))
         self.picture.setAcceptDrops(True)
         self.picture.setAutoFillBackground(False)
         self.picture.setText("")
         self.picture.setAlignment(QtCore.Qt.AlignCenter)
         self.picture.setObjectName("picture")
         self.cameraButton = QtWidgets.QPushButton(Dialog)
-        self.cameraButton.setGeometry(QtCore.QRect(1250, 860, 201, 61))
+        self.cameraButton.setGeometry(QtCore.QRect(740, 640, 250, 61))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
@@ -450,7 +451,7 @@ class Ui_Dialog(object):
         self.cameraButton.setIconSize(QtCore.QSize(30, 30))
         self.cameraButton.setObjectName("cameraButton")
         self.noseFilters = QtWidgets.QListWidget(Dialog)
-        self.noseFilters.setGeometry(QtCore.QRect(1250, 545, 421, 201))
+        self.noseFilters.setGeometry(QtCore.QRect(740, 440, 620, 100))
         self.noseFilters.setFocusPolicy(QtCore.Qt.NoFocus)
         self.noseFilters.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.noseFilters.setIconSize(QtCore.QSize(90, 90))
@@ -459,7 +460,7 @@ class Ui_Dialog(object):
         self.noseFilters.setViewMode(QtWidgets.QListView.IconMode)
         self.noseFilters.setObjectName("noseFilters")
         self.earFilters = QtWidgets.QListWidget(Dialog)
-        self.earFilters.setGeometry(QtCore.QRect(1250, 65, 421, 201))
+        self.earFilters.setGeometry(QtCore.QRect(740, 40, 620, 100))
         self.earFilters.setFocusPolicy(QtCore.Qt.NoFocus)
         self.earFilters.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.earFilters.setIconSize(QtCore.QSize(90, 90))
@@ -468,28 +469,28 @@ class Ui_Dialog(object):
         self.earFilters.setViewMode(QtWidgets.QListView.IconMode)
         self.earFilters.setObjectName("earFilters")
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(1250, 30, 461, 31))
+        self.label.setGeometry(QtCore.QRect(740, 10, 461, 31))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(1250, 270, 461, 31))
+        self.label_2.setGeometry(QtCore.QRect(740, 210, 461, 31))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.label_3 = QtWidgets.QLabel(Dialog)
-        self.label_3.setGeometry(QtCore.QRect(1250, 510, 461, 31))
+        self.label_3.setGeometry(QtCore.QRect(740, 410, 461, 31))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.captureButton = QtWidgets.QPushButton(Dialog)
-        self.captureButton.setGeometry(QtCore.QRect(1470, 860, 201, 61))
+        self.captureButton.setGeometry(QtCore.QRect(1000, 640, 250, 61))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
@@ -502,14 +503,14 @@ class Ui_Dialog(object):
         self.captureButton.setIconSize(QtCore.QSize(30, 30))
         self.captureButton.setObjectName("captureButton")
         self.white = QtWidgets.QLabel(Dialog)
-        self.white.setGeometry(QtCore.QRect(20, 20, 1200, 900))
+        self.white.setGeometry(QtCore.QRect(0, 0, 720, 720))
         self.white.setAcceptDrops(True)
         self.white.setAutoFillBackground(False)
         self.white.setText("")
         self.white.setAlignment(QtCore.Qt.AlignCenter)
         self.white.setObjectName("white")
         self.checkBox = QtWidgets.QCheckBox(Dialog)
-        self.checkBox.setGeometry(QtCore.QRect(1250, 790, 201, 51))
+        self.checkBox.setGeometry(QtCore.QRect(1260, 640, 91, 61))
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei Mono")
         font.setPointSize(12)
@@ -527,4 +528,5 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "Eye Filters:"))
         self.label_3.setText(_translate("Dialog", "Nose Filters:"))
         self.checkBox.setText(_translate("Dialog", "Fancy Mode"))
+
 
