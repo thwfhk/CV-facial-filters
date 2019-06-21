@@ -89,6 +89,7 @@ class twh:
 '''
 
 
+'''
 selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
@@ -103,3 +104,4 @@ if __name__ == '__main__':
         plt.imshow(res)
         plt.show()
         plt.imsave("test_results/"+name[:-4]+"_res.png", res)
+'''
