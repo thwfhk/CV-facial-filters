@@ -38,7 +38,7 @@ class my3ddfa:
         self.model.eval()
 
     def meow_landmarks(self, img_ori, rects, bbox_steps='one'):
-        # img_ori = img_ori[:,:,::-1] #rgb->bgr
+        img_ori = img_ori[:,:,::-1] #rgb->bgr
         # img_ori = cv2.cvtColor(img_ori, cv2.COLOR_RGB2BGR)
 
         # 3. forward

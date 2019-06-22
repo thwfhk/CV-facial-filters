@@ -7,7 +7,7 @@ from MEOW3DDFA import a_3ddfa
 import filters
 
 
-class twh:
+class candy:
     def __init__(self, mo='gpu'):
         self.detector = mbn.get_detector()
         self.landmarkor = a_3ddfa.my3ddfa(mo)
@@ -46,14 +46,13 @@ class twh:
             img = filters.add_filters(img, P, pts_3d, roi_box, selected_filters, fancy_mode)
         return img
 
-    # 使用rgb，进行了镜面处理
     def addFilters(self, frame, selected_filters, fancy_mode, bbox_steps='one', mirroring=True):
+        frame = frame[:,:,::-1] # bgr -> rgb
         if mirroring:
             frame = frame[:, ::-1, :]
             bbox_steps = 'one'
         if len(selected_filters) == 0:
             return frame[:,:,::-1]
         awsl = self.get_landmarks(frame, bbox_steps)
-        frame = frame[:,:,::-1]
         res = self.plot(frame, *awsl, selected_filters, fancy_mode)
         return res

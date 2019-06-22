@@ -37,7 +37,7 @@ class Worker(QThread):
     cap = cv2.VideoCapture(CAMERA_ID)
     sinOut = pyqtSignal()
     data = None
-    twh = maghsk.twh(mo=DEVICE)
+    candy = maghsk.candy(mo=DEVICE)
 
     def __init__(self, typ):
         super(Worker, self).__init__()
@@ -55,12 +55,12 @@ class Worker(QThread):
     def run(self):
         if self.typ == "camera":
             while self.keep_running:
-                _, self.raw_image = self.cap.read()
+                _, self.raw_image = self.cap.read() #bgr
                 # self.raw_image = self.raw_image[:,:,::-1]
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2HSV)
                 # self.raw_image[2] = cv2.equalizeHist(self.raw_image[2])
                 # self.raw_image = cv2.cvtColor(self.raw_image, cv2.COLOR_HSV2RGB)
-                self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters, fancy_mode=form.ui.checkBox.isChecked())
+                self.data = self.candy.addFilters(self.raw_image.copy(), selectedFilters, fancy_mode=form.ui.checkBox.isChecked())
                 self.sinOut.emit()
         elif self.typ == "photo":
             if not self.qinding:
@@ -81,7 +81,7 @@ class Worker(QThread):
 
                 self.raw_image = cv2.resize(self.raw_image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 self.raw_image = fit_to_480x640(self.raw_image, PIC_WIDTH, PIC_HEIGHT)
-            self.data = self.twh.addFilters(self.raw_image.copy(), selectedFilters, bbox_steps='two', mirroring=self.qinding, fancy_mode=form.ui.checkBox.isChecked())
+            self.data = self.candy.addFilters(self.raw_image.copy(), selectedFilters, bbox_steps='two', mirroring=self.qinding, fancy_mode=form.ui.checkBox.isChecked())
             self.sinOut.emit()
 
 

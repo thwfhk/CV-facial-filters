@@ -23,7 +23,7 @@ def get_time(func):
     return wrapper
 
 
-class twh:
+class candy:
     def __init__(self, mo='cpu'):
         self.landmarkor = a_3ddfa.my3ddfa(mo)
 
@@ -69,8 +69,8 @@ class twh:
 
 
     #bgr
-    def addFilters(self, frame, selected_filters, fancy_mode, bbox_steps='one', mirroring=True):
-        frame = frame[:, :, ::-1]
+    def addFilters(self, frame, selected_filters, fancy_mode='true', bbox_steps='one', mirroring=True):
+        frame = frame[:, :, ::-1] # bgr -> rgb
         if mirroring:
             frame = frame[:, ::-1, :]
             bbox_steps = 'one'
@@ -89,19 +89,18 @@ class twh:
 '''
 
 
-'''
 selected_filters = {"eye":"glass", "ear":"rabbit_ear", "nose":"cat_nose"}
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
+    hi = candy()
     img_name_list = ["cha1.jpg", "cha2.jpg", "ts1.jpg", "ts2.jpg", "ts3.jpg", "tc1.jpg"]
     img_name_list = ["tc2.png", "tc3.png", "tc4.png", "tc5.png", "b1.jpg", "b2.jpg"]
     img_name_list = ["cha1.jpg", "cha3.jpg", "cha4.jpg", "s.jpg", "t.jpg"]
     for name in img_name_list:
         img = cv2.imread("test_images/" + name)[:,:,::-1]
         print(img.shape)
-        res = plot_landmarks(img, selected_filters)
+        res = hi.addFilters(img, selected_filters)
         plt.imshow(res)
         plt.show()
         plt.imsave("test_results/"+name[:-4]+"_res.png", res)
-'''
