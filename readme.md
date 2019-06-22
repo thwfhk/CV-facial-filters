@@ -8,7 +8,7 @@ Author: [Candy?](https://github.com/thwfhk), [maghsk](https://github.com/maghsk)
 
 这是AI引论课CV实践课的一个课程大作业。
 
-具体内容请见`poster.pdf`
+具体内容请见poster
 
 ![poster](poster.jpg)
 
