@@ -1,6 +1,6 @@
 # 实时人脸贴纸：基于3D人脸模型
 
-作者：twh, hyd, cxn
+Author: [Candy?](https://github.com/thwfhk), [maghsk](https://github.com/maghsk), [CeoxNim](https://github.com/CeoxNim)
 
 ## 项目说明
 
@@ -32,7 +32,7 @@
 
 `big-final.ui`和`ui.py`等是GUI相关文件。
 
-如果有任何运行问题，请联系tangwh@pku.edu.cn
+如果有任何运行问题，请联系 tangwh@pku.edu.cn
 
 ## References
 * https://github.com/cleardusk/3DDFA
