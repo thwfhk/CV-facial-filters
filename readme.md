@@ -16,7 +16,7 @@ Author: [Candy?](https://github.com/thwfhk), [maghsk](https://github.com/maghsk)
 
 `main.py` 是主程序，`python main.py`可以进入图形化界面。
 
-默认使用CPU，如果要改用GPU，请使用`python main.py -device='gpu'`
+默认使用CPU，如果要改用GPU，请手动修改`main.py`
 
 `a_fb.py`和`a_mbn.py`是各部分的拼接，不同之处在于一个使用faceboxes另一个使用mobilenet。
 
